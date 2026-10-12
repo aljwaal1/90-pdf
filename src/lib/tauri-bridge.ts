@@ -25,8 +25,18 @@ async function getTauriInvoke() {
   return invoke;
 }
 
+/**
+ * Android's Storage Access Framework returns content:// URIs, not regular
+ * filesystem paths. Use WebView's native <input type="file"> bridge there
+ * so the selected File can be read without assuming a filesystem path.
+ */
+const isAndroidTauri = (): boolean =>
+  isTauri() &&
+  typeof navigator !== 'undefined' &&
+  /Android/i.test(navigator.userAgent);
+
 export async function openFiles(filters: FileFilter[] = []): Promise<string[]> {
-  if (isTauri()) {
+  if (isTauri() && !isAndroidTauri()) {
     const invoke = await getTauriInvoke();
     return invoke<string[]>('open_files', { filters });
   }
@@ -35,24 +45,40 @@ export async function openFiles(filters: FileFilter[] = []): Promise<string[]> {
     const input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
-    if (filters.length > 0) {
-      const exts = filters.flatMap(f => f.extensions.map(ext => `.${ext}`));
-      input.accept = exts.join(',');
+    input.style.display = 'none';
+    const exts = filters.flatMap(f =>
+      f.extensions.filter(ext => ext !== '*').map(ext => `.${ext.replace(/^\\./, '')}`)
+    );
+    if (exts.length && !filters.some(f => f.extensions.includes('*'))) {
+      input.accept = [...new Set(exts)].join(',');
     }
 
-    input.onchange = () => {
-      if (input.files) {
-        const files = Array.from(input.files).map((file) => {
-          const browserPath = `__browser__/${crypto.randomUUID()}/${file.name}`;
-          browserFileStore.set(browserPath, file);
-          return browserPath;
-        });
-        resolve(files);
-      } else {
-        resolve([]);
-      }
+    let settled = false;
+    const finish = (paths: string[]) => {
+      if (settled) return;
+      settled = true;
+      window.removeEventListener('focus', onFocus);
+      input.remove();
+      resolve(paths);
     };
-
+    const onFocus = () => {
+      // Some WebViews don't dispatch 'cancel'. After returning from the
+      // picker, give the 'change' event time to deliver the selected files.
+      setTimeout(() => {
+        if (!settled && (!input.files || input.files.length === 0)) finish([]);
+      }, 500);
+    };
+    input.addEventListener('change', () => {
+      const paths = Array.from(input.files ?? []).map(file => {
+        const browserPath = `__browser__/${crypto.randomUUID()}/${file.name}`;
+        browserFileStore.set(browserPath, file);
+        return browserPath;
+      });
+      finish(paths);
+    }, { once: true });
+    input.addEventListener('cancel', () => finish([]), { once: true });
+    window.addEventListener('focus', onFocus);
+    document.body.appendChild(input);
     input.click();
   });
 }
@@ -123,6 +149,12 @@ export async function saveFile(suggestedName: string, filters: FileFilter[] = []
 }
 
 export async function readFileBytes(path: string): Promise<Uint8Array> {
+  // Files selected through Android's WebView picker live in the in-memory
+  // browser store even though the surrounding app is a Tauri application.
+  const selectedFile = browserFileStore.get(path);
+  if (selectedFile) {
+    return new Uint8Array(await selectedFile.arrayBuffer());
+  }
   if (isTauri()) {
     const invoke = await getTauriInvoke();
     const data = await invoke<number[]>('read_file', { path });
