@@ -1,0 +1,39 @@
+name: Import complete PDFCraft source
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/import-upstream.yml'
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Fetch complete upstream code
+        run: |
+          git clone --depth 1 https://github.com/PDFCraftTool/pdfcraft.git /tmp/pdfcraft-upstream
+          rsync -a --delete --exclude='.git/' --exclude='.github/workflows/' /tmp/pdfcraft-upstream/ ./
+          mkdir -p .github/workflows
+          cat > ANDROID_PORT.md <<'DOC'
+          # 90 PDF Android port
+          Original upstream: https://github.com/PDFCraftTool/pdfcraft
+          Licensing: AGPL-3.0; preserve LICENSE and notices.
+          Objective: all 90+ original tools, not a limited subset.
+          This repository imports the real original source and uses Tauri 2 mobile as a packaging route.
+          Android feature parity must be verified on a device; some WASM/worker/LibreOffice functions may need adaptation.
+          Android test builds are not production-ready until the compatibility matrix passes.
+          DOC
+          git status --short
+      - name: Commit imported source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Import full PDFCraft upstream source for Android port"
+            git push
+          fi
