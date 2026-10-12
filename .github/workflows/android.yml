@@ -48,7 +48,7 @@ jobs:
           echo "NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+          targets: aarch64-linux-android
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri -> target
@@ -70,8 +70,12 @@ jobs:
         run: npx tauri android init --ci
       - name: Strip desktop-only Rust crate attribute for Android
         run: sed -i '1d' src-tauri/src/main.rs
-      - name: Build universal debug APK
-        run: npx tauri android build --apk --debug --ci
+      - name: Build ARM64 debug APK
+        env:
+          CARGO_BUILD_JOBS: '2'
+          CARGO_PROFILE_DEV_DEBUG: '0'
+          CARGO_INCREMENTAL: '0'
+        run: npx tauri android build --apk --debug --ci --target aarch64
       - name: Upload APK
         if: always()
         uses: actions/upload-artifact@v4
