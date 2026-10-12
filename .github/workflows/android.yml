@@ -63,6 +63,8 @@ jobs:
           NODE
       - name: Initialize Tauri Android project
         run: npx tauri android init --ci
+      - name: Strip desktop-only Rust crate attribute for Android
+        run: sed -i '1d' src-tauri/src/main.rs
       - name: Build universal debug APK
         run: npx tauri android build --apk --debug --ci
       - name: Upload APK
