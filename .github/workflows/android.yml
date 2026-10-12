@@ -25,7 +25,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
+      - name: Check Android SDK tools
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          command -v sdkmanager || true
+          ls -la "$ANDROID_HOME/cmdline-tools" || true
+          yes | sdkmanager --licenses >/dev/null || true
       - name: Install Android NDK
         run: |
           sdkmanager --install "ndk;27.2.12479018" "platforms;android-35" "build-tools;35.0.0"
