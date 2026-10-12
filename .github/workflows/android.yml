@@ -79,6 +79,30 @@ jobs:
           CARGO_PROFILE_RELEASE_OPT_LEVEL: 'z'
           CARGO_INCREMENTAL: '0'
         run: npx tauri android build --apk --ci --target aarch64
+      - name: Sign release APK with temporary test key
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="src-tauri/gen/android/app/build/outputs/apk"
+          UNSIGNED="$(find "$OUT" -type f -name '*unsigned.apk' -print -quit)"
+          test -n "$UNSIGNED" || { echo "Unsigned release APK not found"; exit 1; }
+          mkdir -p /tmp/pdfcraft-signing
+          keytool -genkeypair -v -keystore /tmp/pdfcraft-signing/test.jks \
+            -alias pdfcraft-test -keyalg RSA -keysize 3072 -validity 3650 \
+            -storepass changeit -keypass changeit \
+            -dname "CN=90 PDF Temporary Test Build,O=PDFCraft,C=SE"
+          ZIPALIGN="$ANDROID_HOME/build-tools/35.0.0/zipalign"
+          APKSIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          "$ZIPALIGN" -f -p 4 "$UNSIGNED" /tmp/pdfcraft-signing/aligned.apk
+          mkdir -p "$OUT/signed"
+          "$APKSIGNER" sign --ks /tmp/pdfcraft-signing/test.jks \
+            --ks-key-alias pdfcraft-test --ks-pass pass:changeit \
+            --key-pass pass:changeit \
+            --out "$OUT/signed/90-pdf-arm64-test-signed.apk" \
+            /tmp/pdfcraft-signing/aligned.apk
+          "$APKSIGNER" verify --verbose --print-certs "$OUT/signed/90-pdf-arm64-test-signed.apk"
+          rm -f "$UNSIGNED"
+          echo "Temporary signing key is discarded after this run. Later builds cannot update this installation without uninstalling it."
       - name: Report APK size
         if: success()
         run: find src-tauri/gen/android/app/build/outputs/apk -name '*.apk' -type f -printf '%p %s bytes\n'
@@ -86,8 +110,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: 90-pdf-android-release
-          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          name: 90-pdf-android-test-signed
+          path: src-tauri/gen/android/app/build/outputs/apk/signed/*.apk
           if-no-files-found: warn
       - name: Upload Android build reports
         if: failure()
