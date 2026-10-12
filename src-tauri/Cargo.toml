@@ -5,6 +5,10 @@ description = "PDFCraft Desktop Application"
 authors = ["PDFCraft"]
 edition = "2021"
 
+[lib]
+name = "pdfcraft"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
