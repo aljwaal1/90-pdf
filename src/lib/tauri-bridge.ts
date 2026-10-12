@@ -47,7 +47,7 @@ export async function openFiles(filters: FileFilter[] = []): Promise<string[]> {
     input.multiple = true;
     input.style.display = 'none';
     const exts = filters.flatMap(f =>
-      f.extensions.filter(ext => ext !== '*').map(ext => `.${ext.replace(/^\\./, '')}`)
+      f.extensions.filter(ext => ext !== '*').map(ext => `.${ext.replace(/^\./, '')}`)
     );
     if (exts.length && !filters.some(f => f.extensions.includes('*'))) {
       input.accept = [...new Set(exts)].join(',');
