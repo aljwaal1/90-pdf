@@ -1,4 +1,4 @@
-name: Android APK (experimental)
+name: Android APK (ARM64 release)
 on:
   workflow_dispatch:
   push:
@@ -70,17 +70,23 @@ jobs:
         run: npx tauri android init --ci
       - name: Strip desktop-only Rust crate attribute for Android
         run: sed -i '1d' src-tauri/src/main.rs
-      - name: Build ARM64 debug APK
+      - name: Build ARM64 release APK
         env:
           CARGO_BUILD_JOBS: '2'
-          CARGO_PROFILE_DEV_DEBUG: '0'
+          CARGO_PROFILE_RELEASE_LTO: 'thin'
+          CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '1'
+          CARGO_PROFILE_RELEASE_STRIP: 'symbols'
+          CARGO_PROFILE_RELEASE_OPT_LEVEL: 'z'
           CARGO_INCREMENTAL: '0'
-        run: npx tauri android build --apk --debug --ci --target aarch64
+        run: npx tauri android build --apk --ci --target aarch64
+      - name: Report APK size
+        if: success()
+        run: find src-tauri/gen/android/app/build/outputs/apk -name '*.apk' -type f -printf '%p %s bytes\n'
       - name: Upload APK
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: 90-pdf-android-debug
+          name: 90-pdf-android-release
           path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
           if-no-files-found: warn
       - name: Upload Android build reports
