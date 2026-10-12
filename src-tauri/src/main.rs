@@ -243,13 +243,17 @@ fn get_system_printers() -> Result<Vec<SystemPrinter>, String> {
 
 #[tauri::command]
 fn print_pdf_file(data: Vec<u8>, printer_name: Option<String>) -> Result<(), String> {
+    #[cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))]
     let timestamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_millis())
         .unwrap_or(0);
+    #[cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))]
     let temp_file_path = env::temp_dir().join(format!("pdfcraft_print_{}.pdf", timestamp));
+    #[cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))]
     fs::write(&temp_file_path, &data).map_err(|e| e.to_string())?;
 
+    #[cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))]
     let file_path_str = temp_file_path.to_string_lossy().to_string();
 
     #[cfg(target_os = "windows")]
@@ -301,7 +305,8 @@ fn print_pdf_file(data: Vec<u8>, printer_name: Option<String>) -> Result<(), Str
 
     #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
     {
-        Err("Unsupported operating system for printing".to_string())
+        let _ = (data, printer_name);
+        Err("Printing on Android requires the system print dialog; desktop printing is unavailable.".to_string())
     }
 }
 
