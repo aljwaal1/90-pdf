@@ -89,7 +89,10 @@ jobs:
           set -euo pipefail
           OUT="src-tauri/gen/android/app/build/outputs/apk"
           UNSIGNED="$(find "$OUT" -type f -name '*unsigned.apk' -print -quit)"
-          test -n "$UNSIGNED" || { echo "Unsigned release APK not found"; exit 1; }
+          if [ -z "$UNSIGNED" ]; then
+            UNSIGNED="$(find "$OUT" -type f -name '*release.apk' ! -path '*/signed/*' -print -quit)"
+          fi
+          test -n "$UNSIGNED" || { echo "Release APK not found"; find "$OUT" -type f -name '*.apk'; exit 1; }
           mkdir -p /tmp/pdfcraft-signing
           keytool -genkeypair -v -keystore /tmp/pdfcraft-signing/test.jks \
             -alias pdfcraft-test -keyalg RSA -keysize 3072 -validity 3650 \
