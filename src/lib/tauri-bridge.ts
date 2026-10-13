@@ -118,6 +118,9 @@ export function getFiltersForFilename(filename: string): FileFilter[] {
 
 export async function saveFile(suggestedName: string, filters: FileFilter[] = []): Promise<string | null> {
   if (isTauri()) {
+    if (isAndroidTauri()) {
+      throw new Error('Android native save is not available; refusing to return an invalid filesystem path');
+    }
     try {
       const invoke = await getTauriInvoke();
       return await invoke<string>('save_file', { suggestedName, filters });
@@ -171,6 +174,9 @@ export async function readFileBytes(path: string): Promise<Uint8Array> {
 }
 
 export async function writeFileBytes(path: string, data: Uint8Array): Promise<void> {
+  if (isAndroidTauri()) {
+    throw new Error('Android SAF write support is required; cannot write a content URI as a filesystem path');
+  }
   if (isTauri()) {
     try {
       const invoke = await getTauriInvoke();
