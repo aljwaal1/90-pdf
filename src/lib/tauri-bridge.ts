@@ -180,7 +180,8 @@ export async function readFileBytes(path: string): Promise<Uint8Array> {
   }
   if (isAndroidTauri() && path.startsWith('content://')) {
     const { readFile } = await import('tauri-plugin-android-fs-api');
-    return await readFile(path);
+    const result = await readFile(path);
+    return result instanceof Uint8Array ? result : new Uint8Array(result);
   }
   if (isTauri()) {
     const invoke = await getTauriInvoke();
