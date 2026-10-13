@@ -14,7 +14,7 @@ vi.mock('tauri-plugin-android-fs-api', () => ({
   getFileByteLength: saf.length,
 }));
 
-import { readFileBytes, saveBlobFile, saveFile, writeFileBytes } from './tauri-bridge';
+import { printPdfFile, readFileBytes, saveBlobFile, saveFile, writeFileBytes } from './tauri-bridge';
 
 describe('Android SAF persistence', () => {
   beforeEach(() => {
@@ -106,6 +106,11 @@ describe('Android SAF persistence', () => {
     saf.read.mockResolvedValue([10, 20, 30]);
     await expect(readFileBytes('content://documents/123'))
       .resolves.toEqual(new Uint8Array([10, 20, 30]));
+  });
+
+  it('does not claim successful native printing on Android', async () => {
+    await expect(printPdfFile(new Uint8Array([1, 2, 3])))
+      .resolves.toMatchObject({ success: false });
   });
 
   it('rejects non-content destinations for Android writes', async () => {
