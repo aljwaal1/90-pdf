@@ -130,13 +130,13 @@ export async function saveFile(suggestedName: string, filters: FileFilter[] = []
     };
     try {
       const destination = await showSaveFilePicker(suggestedName, mime[ext] || 'application/octet-stream');
-      if (!destination) return null;
+      if (destination == null || destination === '') return null;
       if (typeof destination !== 'string' || !destination.startsWith('content://')) {
         throw new Error('Android SAF did not return a document URI');
       }
       return destination;
     } catch (error) {
-      if (/cancel|dismiss|abort/i.test(String(error))) return null;
+      if (/\b(cancelled|canceled|user cancel|dismissed|aborted)\b/i.test(String(error))) return null;
       throw error;
     }
   }
@@ -182,6 +182,9 @@ export async function readFileBytes(path: string): Promise<Uint8Array> {
     const { readFile } = await import('tauri-plugin-android-fs-api');
     const result = await readFile(path);
     return result instanceof Uint8Array ? result : new Uint8Array(result);
+  }
+  if (isAndroidTauri()) {
+    throw new Error('Android can only read selected files or SAF document URIs');
   }
   if (isTauri()) {
     const invoke = await getTauriInvoke();
