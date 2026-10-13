@@ -55,15 +55,12 @@ export function ToolCard({ tool, locale, className = '', localizedContent }: Too
   const categoryName = t(`home.categories.${categoryTranslationKeys[tool.category]}`);
 
   return (
-    <Link
-      href={toolUrl}
-      className={`block focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--color-ring))] focus-visible:ring-offset-2 rounded-[var(--radius-lg)] group ${className}`}
-      data-testid="tool-card"
-    >
+    <div className={`relative group ${className}`} data-testid="tool-card">
       <Card
         className="h-full glass-card hover:bg-[hsl(var(--color-card))/0.8] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden border-[hsl(var(--color-border))/0.6]"
         data-testid="tool-card-container"
       >
+        <Link href={toolUrl} aria-label={toolName} className="absolute inset-0 z-0 rounded-[var(--radius-lg)] focus-visible:outline focus-visible:outline-4 focus-visible:outline-blue-500" />
         <div className="absolute top-0 right-0 p-3 z-10">
           <FavoriteButton toolId={tool.id} size="sm" />
         </div>
@@ -71,7 +68,7 @@ export function ToolCard({ tool, locale, className = '', localizedContent }: Too
           <ArrowUpRight className="w-5 h-5 text-[hsl(var(--color-primary))]" />
         </div>
 
-        <div className="flex flex-col h-full">
+        <div className="relative pointer-events-none flex flex-col h-full">
           <div className="flex items-start gap-4 mb-4">
             {/* Tool Icon */}
             <div
@@ -109,7 +106,7 @@ export function ToolCard({ tool, locale, className = '', localizedContent }: Too
           </div>
         </div>
       </Card>
-    </Link>
+    </div>
   );
 }
 
