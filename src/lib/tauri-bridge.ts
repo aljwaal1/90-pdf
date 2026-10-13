@@ -299,8 +299,9 @@ export async function saveBlobFile(
   document.body.removeChild(a);
   setTimeout(() => {
     URL.revokeObjectURL(url);
-  }, 1000);
-  return true;
+  }, 60000);
+  // A browser download cannot be verified as persisted on the device.
+  return false;
 }
 
 /**
