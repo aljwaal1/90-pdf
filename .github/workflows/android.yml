@@ -114,12 +114,12 @@ jobs:
         if: success()
         run: find src-tauri/gen/android/app/build/outputs/apk -name '*.apk' -type f -printf '%p %s bytes\n'
       - name: Upload APK
-        if: always()
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: 90-pdf-android-test-signed
           path: src-tauri/gen/android/app/build/outputs/apk/signed/*.apk
-          if-no-files-found: warn
+          if-no-files-found: error
       - name: Upload Android build reports
         if: failure()
         uses: actions/upload-artifact@v4
