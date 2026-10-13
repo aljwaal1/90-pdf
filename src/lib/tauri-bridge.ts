@@ -204,7 +204,7 @@ export async function writeFileBytes(path: string, data: Uint8Array): Promise<vo
     const { writeFile, getFileByteLength } = await import('tauri-plugin-android-fs-api');
     await writeFile(path, data);
     const length = await getFileByteLength(path);
-    if (!Number.isSafeInteger(Number(length)) || Number(length) !== data.byteLength) {
+    if (typeof length !== 'number' || !Number.isSafeInteger(length) || length !== data.byteLength) {
       throw new Error(`Android SAF saved ${length} bytes; expected ${data.byteLength}`);
     }
     return;
