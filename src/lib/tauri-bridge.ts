@@ -230,7 +230,8 @@ export async function writeFileBytes(path: string, data: Uint8Array): Promise<vo
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  // Allow the browser download handler to consume the object URL first.
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 /**
