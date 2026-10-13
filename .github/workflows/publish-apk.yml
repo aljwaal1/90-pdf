@@ -1,0 +1,35 @@
+name: Publish signed APK direct download
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-apk.yml
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download verified signed APK from successful build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh run download 38321723322 -R "${{ github.repository }}" -n 90-pdf-android-test-signed -D apk
+          test -s apk/90-pdf-arm64-test-signed.apk
+          unzip -t apk/90-pdf-arm64-test-signed.apk | tail -1
+          ls -lh apk/*.apk
+      - name: Publish prerelease with direct APK asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="android-test-20261013"
+          gh release create "$TAG" apk/90-pdf-arm64-test-signed.apk \
+            -R "${{ github.repository }}" \
+            --target "${{ github.sha }}" \
+            --title "90 PDF Android ARM64 test APK" \
+            --notes "Test-signed Android ARM64 APK from successful workflow run 38321723322. Temporary key; not suitable for seamless updates. Android device testing pending." \
+            --prerelease
