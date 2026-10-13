@@ -18,9 +18,10 @@ export const localeConfig: Record<Locale, {
   ar: { name: 'Arabic', nativeName: 'العربية', direction: 'rtl', dateFormat: 'DD/MM/YYYY' },
 };
 
-// Keep locale-prefix handling in sync with the canonical locale registry. Sort
-// longer locale codes first so a code such as zh-TW is matched as a whole.
-const escapedLocaleCodes = locales
+// Strip legacy locale prefixes when generating new Arabic/English routes.
+// Only en/ar remain supported as destinations; old bookmarks should not nest prefixes.
+const legacyLocales = ['en', 'ar', 'ja', 'ko', 'es', 'fr', 'de', 'zh', 'zh-TW', 'pt', 'it', 'id', 'vi', 'ro', 'pl'] as const;
+const escapedLocaleCodes = legacyLocales
   .map((locale) => locale.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
   .sort((a, b) => b.length - a.length);
 const localePrefixPattern = new RegExp(`^/(?:${escapedLocaleCodes.join('|')})(?=/|$)`);
