@@ -162,17 +162,16 @@ export async function saveFile(suggestedName: string, filters: FileFilter[] = []
       ) {
         return null;
       }
-      // Fallback: attempt to use @tauri-apps/plugin-dialog save
-      try {
-        const { save } = await import('@tauri-apps/plugin-dialog');
-        const res = await save({
-          defaultPath: suggestedName,
-          filters: filters.map((f) => ({ name: f.name, extensions: f.extensions })),
-        });
-        return res;
-      } catch {
+      // Only use the dialog fallback when the native command is unavailable.
+      // A real write/picker error must not be silently replaced by another dialog.
+      if (!/unknown command|command .*not found|not registered/i.test(errMsg)) {
         throw err;
       }
+      const { save } = await import('@tauri-apps/plugin-dialog');
+      const validFilters = filters
+        .map(f => ({ name: f.name, extensions: f.extensions.filter(ext => ext !== '*') }))
+        .filter(f => f.extensions.length > 0);
+      return save({ defaultPath: suggestedName, filters: validFilters });
     }
   }
 
