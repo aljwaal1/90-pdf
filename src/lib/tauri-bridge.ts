@@ -38,7 +38,11 @@ const isAndroidTauri = (): boolean =>
 export async function openFiles(filters: FileFilter[] = []): Promise<string[]> {
   if (isTauri() && !isAndroidTauri()) {
     const invoke = await getTauriInvoke();
-    return invoke<string[]>('open_files', { filters });
+    const paths = await invoke<string[]>('open_files', { filters });
+    if (!Array.isArray(paths) || !paths.every(path => typeof path === 'string')) {
+      throw new Error('Native file picker returned invalid paths');
+    }
+    return paths;
   }
 
   return new Promise((resolve) => {
