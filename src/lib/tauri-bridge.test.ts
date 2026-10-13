@@ -3,16 +3,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const saf = vi.hoisted(() => ({
   pick: vi.fn(),
   write: vi.fn(),
+  read: vi.fn(),
   length: vi.fn(),
 }));
 
 vi.mock('tauri-plugin-android-fs-api', () => ({
   showSaveFilePicker: saf.pick,
   writeFile: saf.write,
+  readFile: saf.read,
   getFileByteLength: saf.length,
 }));
 
-import { saveBlobFile, saveFile, writeFileBytes } from './tauri-bridge';
+import { readFileBytes, saveBlobFile, saveFile, writeFileBytes } from './tauri-bridge';
 
 describe('Android SAF persistence', () => {
   beforeEach(() => {
@@ -21,6 +23,7 @@ describe('Android SAF persistence', () => {
     vi.stubGlobal('navigator', { userAgent: 'Mozilla/5.0 (Linux; Android 15)' });
     saf.pick.mockResolvedValue('content://documents/123');
     saf.write.mockResolvedValue(undefined);
+    saf.read.mockResolvedValue(new Uint8Array([1, 2, 3, 4]));
     saf.length.mockResolvedValue(4);
   });
 
@@ -75,6 +78,12 @@ describe('Android SAF persistence', () => {
     saf.length.mockResolvedValue(0);
     await expect(writeFileBytes('content://documents/123', new Uint8Array()))
       .resolves.toBeUndefined();
+  });
+
+  it('reads Android content URIs through the SAF provider', async () => {
+    await expect(readFileBytes('content://documents/123'))
+      .resolves.toEqual(new Uint8Array([1, 2, 3, 4]));
+    expect(saf.read).toHaveBeenCalledWith('content://documents/123');
   });
 
   it('rejects non-content destinations for Android writes', async () => {
