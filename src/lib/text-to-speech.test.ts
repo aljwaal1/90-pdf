@@ -77,6 +77,12 @@ describe('long document speech', () => {
     await expect(completion).rejects.toThrow('Speech cancelled');
   });
 
+  it('reports missing WebView utterance support without crashing', async () => {
+    vi.stubGlobal('SpeechSynthesisUtterance', undefined);
+    await expect(speakText('مرحبا')).rejects.toThrow('voice API is not available');
+    expect(speak).not.toHaveBeenCalled();
+  });
+
   it('clamps non-finite voice settings', async () => {
     const completion = speakText('hello', { rate: Number.NaN, pitch: Infinity });
     expect(queued[0].rate).toBe(1);
