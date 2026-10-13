@@ -21,6 +21,6 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
       - name: Unit tests
-        run: npm test -- --run
+        run: npm test
       - name: Build web assets
         run: npm run build
