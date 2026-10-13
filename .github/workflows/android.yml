@@ -56,6 +56,12 @@ jobs:
           cache-on-failure: true
       - name: Install dependencies
         run: npm ci
+      - name: TypeScript typecheck
+        run: npx tsc --noEmit
+      - name: Run unit tests
+        run: npm test
+      - name: Build production web assets
+        run: npm run build
       - name: Prepare Android identifier and output
         run: |
           node - <<'NODE'
@@ -69,7 +75,13 @@ jobs:
       - name: Initialize Tauri Android project
         run: npx tauri android init --ci
       - name: Strip desktop-only Rust crate attribute for Android
-        run: sed -i '1d' src-tauri/src/main.rs
+        run: |
+          if head -n 1 src-tauri/src/main.rs | grep -Fq '#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]'; then
+            sed -i '1d' src-tauri/src/main.rs
+          else
+            echo "Unexpected Rust entrypoint header; refusing to delete arbitrary source" >&2
+            exit 1
+          fi
       - name: Build ARM64 release APK
         env:
           CARGO_BUILD_JOBS: '2'
