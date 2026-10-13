@@ -17,14 +17,6 @@ interface HomePageClientProps {
   localizedToolContent?: Record<string, { title: string; description: string }>;
 }
 
-// ... (previous imports)
-
-// ... (props interface)
-
-// ... (previous imports)
-
-// ... (props interface)
-
 export default function HomePageClient({ locale, localizedToolContent }: HomePageClientProps) {
   const t = useTranslations();
   const allTools = getAllTools();
@@ -137,7 +129,7 @@ export default function HomePageClient({ locale, localizedToolContent }: HomePag
                     className="h-11 px-7 text-base shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:-translate-y-0.5 gap-2"
                   >
                     <Sparkles className="h-4 w-4" aria-hidden="true" />
-                    <span>{locale === 'zh' ? '进入 Studio 工作台' : 'Open PDF Studio'}</span>
+                    <span>{locale === 'ar' ? 'فتح استوديو PDF' : 'Open PDF Studio'}</span>
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-white/20 text-white leading-none">
                       NEW
                     </span>
