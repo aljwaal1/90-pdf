@@ -117,6 +117,24 @@ export function getFiltersForFilename(filename: string): FileFilter[] {
 }
 
 export async function saveFile(suggestedName: string, filters: FileFilter[] = []): Promise<string | null> {
+  if (isAndroidTauri()) {
+    const { showSaveFilePicker } = await import('tauri-plugin-android-fs-api');
+    const ext = suggestedName.split('.').pop()?.toLowerCase() || '';
+    const mime: Record<string, string> = {
+      pdf: 'application/pdf', zip: 'application/zip', txt: 'text/plain',
+      json: 'application/json', csv: 'text/csv', png: 'image/png',
+      jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    };
+    try {
+      return await showSaveFilePicker(suggestedName, mime[ext] || 'application/octet-stream');
+    } catch (error) {
+      if (/cancel/i.test(String(error))) return null;
+      throw error;
+    }
+  }
   if (isTauri()) {
     try {
       const invoke = await getTauriInvoke();
@@ -155,6 +173,10 @@ export async function readFileBytes(path: string): Promise<Uint8Array> {
   if (selectedFile) {
     return new Uint8Array(await selectedFile.arrayBuffer());
   }
+  if (isAndroidTauri() && path.startsWith('content://')) {
+    const { readFile } = await import('tauri-plugin-android-fs-api');
+    return await readFile(path);
+  }
   if (isTauri()) {
     const invoke = await getTauriInvoke();
     const data = await invoke<number[]>('read_file', { path });
@@ -171,6 +193,14 @@ export async function readFileBytes(path: string): Promise<Uint8Array> {
 }
 
 export async function writeFileBytes(path: string, data: Uint8Array): Promise<void> {
+  if (isAndroidTauri()) {
+    if (!path.startsWith('content://')) throw new Error('Android SAF document URI required');
+    const { writeFile, getFileByteLength } = await import('tauri-plugin-android-fs-api');
+    await writeFile(path, data);
+    const length = await getFileByteLength(path);
+    if (length !== data.byteLength) throw new Error('Android SAF saved file size mismatch');
+    return;
+  }
   if (isTauri()) {
     try {
       const invoke = await getTauriInvoke();
@@ -220,24 +250,12 @@ export async function saveBlobFile(
   const activeFilters =
     filters && filters.length > 0 ? filters : getFiltersForFilename(suggestedName);
 
-  // Android WebView cannot write content:// URIs with std::fs::write.
-  // Use the browser download bridge instead of reporting a false native save.
   if (isAndroidTauri()) {
-    const blob = fileData instanceof Blob ? fileData : new Blob([Uint8Array.from(fileData)]);
-    const url = URL.createObjectURL(blob);
-    try {
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = suggestedName;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      // A download request is not confirmation that Android saved the file.
-      return false;
-    } finally {
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-    }
+    const destination = await saveFile(suggestedName, activeFilters);
+    if (!destination) return false;
+    const bytes = fileData instanceof Uint8Array ? fileData : new Uint8Array(await fileData.arrayBuffer());
+    await writeFileBytes(destination, bytes);
+    return true;
   }
 
   if (isTauri()) {
