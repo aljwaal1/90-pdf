@@ -220,6 +220,26 @@ export async function saveBlobFile(
   const activeFilters =
     filters && filters.length > 0 ? filters : getFiltersForFilename(suggestedName);
 
+  // Android WebView cannot write content:// URIs with std::fs::write.
+  // Use the browser download bridge instead of reporting a false native save.
+  if (isAndroidTauri()) {
+    const blob = fileData instanceof Blob ? fileData : new Blob([Uint8Array.from(fileData)]);
+    const url = URL.createObjectURL(blob);
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = suggestedName;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // A download request is not confirmation that Android saved the file.
+      return false;
+    } finally {
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }
+  }
+
   if (isTauri()) {
     const selectedPath = await saveFile(suggestedName, activeFilters);
     if (!selectedPath) {
