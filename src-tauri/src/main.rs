@@ -17,13 +17,15 @@ pub struct FileFilter {
 }
 
 #[tauri::command]
-async fn open_files(app: tauri::AppHandle, filters: Vec<FileFilter>) -> Result<Vec<String>, String> {
+fn open_files(app: tauri::AppHandle, filters: Vec<FileFilter>) -> Result<Vec<String>, String> {
     let (tx, rx) = std::sync::mpsc::channel();
     let mut builder = app.dialog().file();
 
     for filter in filters {
-        let exts: Vec<&str> = filter.extensions.iter().map(|s| s.as_str()).collect();
-        builder = builder.add_filter(filter.name, &exts);
+        let exts: Vec<&str> = filter.extensions.iter().map(|s| s.as_str()).filter(|s| *s != "*").collect();
+        if !exts.is_empty() {
+            builder = builder.add_filter(filter.name, &exts);
+        }
     }
 
     builder.pick_files(move |paths| {
@@ -44,13 +46,15 @@ async fn open_files(app: tauri::AppHandle, filters: Vec<FileFilter>) -> Result<V
 }
 
 #[tauri::command]
-async fn save_file(app: tauri::AppHandle, suggested_name: String, filters: Vec<FileFilter>) -> Result<String, String> {
+fn save_file(app: tauri::AppHandle, suggested_name: String, filters: Vec<FileFilter>) -> Result<String, String> {
     let (tx, rx) = std::sync::mpsc::channel();
     let mut builder = app.dialog().file().set_file_name(suggested_name);
 
     for filter in filters {
-        let exts: Vec<&str> = filter.extensions.iter().map(|s| s.as_str()).collect();
-        builder = builder.add_filter(filter.name, &exts);
+        let exts: Vec<&str> = filter.extensions.iter().map(|s| s.as_str()).filter(|s| *s != "*").collect();
+        if !exts.is_empty() {
+            builder = builder.add_filter(filter.name, &exts);
+        }
     }
 
     builder.save_file(move |path| {
