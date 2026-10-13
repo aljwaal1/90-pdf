@@ -159,7 +159,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
   }, [file, blobUrl, filename, isDownloading, autoRevoke, onDownloadStart, onDownloadComplete, toolSlug, toolName]);
 
   // Determine if button should be disabled
-  const isDisabled = disabled || !file || !blobUrl;
+  const isDisabled = disabled || !file || (!isTauri() && !blobUrl);
 
   // Build button text
   const buttonText = label || t('buttons.download');
