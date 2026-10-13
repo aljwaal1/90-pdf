@@ -17,7 +17,7 @@ pub struct FileFilter {
 }
 
 #[tauri::command]
-fn open_files(app: tauri::AppHandle, filters: Vec<FileFilter>) -> Result<Vec<String>, String> {
+async fn open_files(app: tauri::AppHandle, filters: Vec<FileFilter>) -> Result<Vec<String>, String> {
     let (tx, rx) = std::sync::mpsc::channel();
     let mut builder = app.dialog().file();
 
@@ -32,7 +32,7 @@ fn open_files(app: tauri::AppHandle, filters: Vec<FileFilter>) -> Result<Vec<Str
         let _ = tx.send(paths);
     });
 
-    match rx.recv().map_err(|e| e.to_string())? {
+    match tauri::async_runtime::spawn_blocking(move || rx.recv()).await.map_err(|e| e.to_string())?.map_err(|e| e.to_string())? {
         Some(paths) => {
             let mut result = Vec::new();
             for path in paths {
@@ -46,7 +46,7 @@ fn open_files(app: tauri::AppHandle, filters: Vec<FileFilter>) -> Result<Vec<Str
 }
 
 #[tauri::command]
-fn save_file(app: tauri::AppHandle, suggested_name: String, filters: Vec<FileFilter>) -> Result<String, String> {
+async fn save_file(app: tauri::AppHandle, suggested_name: String, filters: Vec<FileFilter>) -> Result<String, String> {
     let (tx, rx) = std::sync::mpsc::channel();
     let mut builder = app.dialog().file().set_file_name(suggested_name);
 
@@ -61,7 +61,7 @@ fn save_file(app: tauri::AppHandle, suggested_name: String, filters: Vec<FileFil
         let _ = tx.send(path);
     });
 
-    match rx.recv().map_err(|e| e.to_string())? {
+    match tauri::async_runtime::spawn_blocking(move || rx.recv()).await.map_err(|e| e.to_string())?.map_err(|e| e.to_string())? {
         Some(path) => {
             let resolved_path = path.into_path().map_err(|e| e.to_string())?;
             Ok(resolved_path.display().to_string())
