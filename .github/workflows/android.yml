@@ -2,7 +2,7 @@ name: Android APK (ARM64 release)
 on:
   workflow_dispatch:
   push:
-    branches: [main, fix/android-saf-rebased-20261013]
+    branches: [main]
     paths-ignore:
       - '**/*.md'
 permissions:
@@ -74,14 +74,6 @@ jobs:
           NODE
       - name: Initialize Tauri Android project
         run: npx tauri android init --ci
-      - name: Strip desktop-only Rust crate attribute for Android
-        run: |
-          if head -n 1 src-tauri/src/main.rs | grep -Fq '#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]'; then
-            sed -i '1d' src-tauri/src/main.rs
-          else
-            echo "Unexpected Rust entrypoint header; refusing to delete arbitrary source" >&2
-            exit 1
-          fi
       - name: Build ARM64 release APK
         env:
           CARGO_BUILD_JOBS: '2'
