@@ -2,7 +2,7 @@ name: Android APK (ARM64 release)
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, fix/android-saf-rebased-20261013]
     paths-ignore:
       - '**/*.md'
 permissions:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     concurrency:
-      group: android-build-main
+      group: android-build-${{ github.ref_name }}
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
