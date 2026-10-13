@@ -230,13 +230,15 @@ export async function writeFileBytes(path: string, data: Uint8Array): Promise<vo
       await invoke('write_file', { path, data: Array.from(data) });
       return;
     } catch (err) {
-      try {
-        const { writeFile } = await import('@tauri-apps/plugin-fs');
-        await writeFile(path, data);
-        return;
-      } catch {
+      const message = err instanceof Error ? err.message : String(err);
+      // Do not retry real filesystem failures (permissions, full disk, etc.)
+      // through a second API: it can obscure the original failure.
+      if (!/unknown command|command .*not found|not registered/i.test(message)) {
         throw err;
       }
+      const { writeFile } = await import('@tauri-apps/plugin-fs');
+      await writeFile(path, data);
+      return;
     }
   }
 
