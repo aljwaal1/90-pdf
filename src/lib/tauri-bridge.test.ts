@@ -74,6 +74,12 @@ describe('Android SAF persistence', () => {
       .rejects.toThrow('expected 4');
   });
 
+  it('rejects a numeric string length rather than trusting coercion', async () => {
+    saf.length.mockResolvedValue('4');
+    await expect(writeFileBytes('content://documents/123', new Uint8Array([1, 2, 3, 4])))
+      .rejects.toThrow('expected 4');
+  });
+
   it('does not confuse an empty document with a failed save', async () => {
     saf.length.mockResolvedValue(0);
     await expect(writeFileBytes('content://documents/123', new Uint8Array()))
