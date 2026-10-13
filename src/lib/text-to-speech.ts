@@ -24,10 +24,10 @@ export function speakText(text: string, options: SpeechOptions = {}): Promise<vo
       reject(new Error('No text available for speech'));
       return;
     }
-    const utterance = new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(text.trim());
     utterance.lang = options.language || 'ar';
-    utterance.rate = Math.min(2, Math.max(0.5, options.rate ?? 1));
-    utterance.pitch = Math.min(2, Math.max(0, options.pitch ?? 1));
+    utterance.rate = options.rate == null || !Number.isFinite(options.rate) ? 1 : Math.min(2, Math.max(0.5, options.rate));
+    utterance.pitch = options.pitch == null || !Number.isFinite(options.pitch) ? 1 : Math.min(2, Math.max(0, options.pitch));
     utterance.onend = () => resolve();
     utterance.onerror = (event) => reject(new Error('Speech failed: ' + event.error));
     window.speechSynthesis.cancel();
