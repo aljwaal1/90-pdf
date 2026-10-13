@@ -40,6 +40,12 @@ describe('Android SAF persistence', () => {
     expect(saf.write).not.toHaveBeenCalled();
   });
 
+  it('treats a native picker cancellation exception as cancellation', async () => {
+    saf.pick.mockRejectedValue(new Error('User canceled'));
+    await expect(saveBlobFile(new Uint8Array([1]), 'output.pdf')).resolves.toBe(false);
+    expect(saf.write).not.toHaveBeenCalled();
+  });
+
   it('rejects invalid native picker destinations', async () => {
     saf.pick.mockResolvedValue('/storage/emulated/0/output.pdf');
     await expect(saveFile('output.pdf')).rejects.toThrow('document URI');
