@@ -58,6 +58,25 @@ describe('Android SAF persistence', () => {
       .rejects.toThrow('expected 4');
   });
 
+  it('does not report success when the SAF provider rejects a write', async () => {
+    saf.write.mockRejectedValue(new Error('Storage full'));
+    await expect(saveBlobFile(new Uint8Array([1, 2, 3, 4]), 'output.pdf'))
+      .rejects.toThrow('Storage full');
+    expect(saf.length).not.toHaveBeenCalled();
+  });
+
+  it('rejects invalid file length responses from the SAF provider', async () => {
+    saf.length.mockResolvedValue('unknown');
+    await expect(writeFileBytes('content://documents/123', new Uint8Array([1, 2, 3, 4])))
+      .rejects.toThrow('expected 4');
+  });
+
+  it('does not confuse an empty document with a failed save', async () => {
+    saf.length.mockResolvedValue(0);
+    await expect(writeFileBytes('content://documents/123', new Uint8Array()))
+      .resolves.toBeUndefined();
+  });
+
   it('rejects non-content destinations for Android writes', async () => {
     await expect(writeFileBytes('/tmp/output.pdf', new Uint8Array([1])))
       .rejects.toThrow('document URI');
