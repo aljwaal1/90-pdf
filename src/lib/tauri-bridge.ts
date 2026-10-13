@@ -391,6 +391,9 @@ export async function printPdfFile(
   fileData: Blob | Uint8Array,
   printerName?: string
 ): Promise<{ success: boolean; error?: string }> {
+  if (isAndroidTauri()) {
+    return { success: false, error: 'Native PDF printing is not supported by this Android build' };
+  }
   if (isTauri()) {
     try {
       const invoke = await getTauriInvoke();
