@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { ArrowRight, Zap, Wrench, Lock, Sparkles, Edit, FileImage, FolderOpen, Settings, ShieldCheck, Star, LayoutGrid } from 'lucide-react';
+import { ChevronLeft, ArrowRight, Zap, Wrench, Lock, Sparkles, Edit, FileImage, FolderOpen, Settings, ShieldCheck, Star, LayoutGrid } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ToolGrid } from '@/components/tools/ToolGrid';
@@ -80,6 +80,15 @@ export default function HomePageClient({ locale, localizedToolContent }: HomePag
     'optimize-repair',
     'secure-pdf',
   ];
+
+  const categoryStyles: Record<ToolCategory, string> = {
+    'edit-annotate': 'from-fuchsia-600 via-purple-600 to-indigo-700',
+    'convert-to-pdf': 'from-sky-500 via-blue-600 to-indigo-700',
+    'convert-from-pdf': 'from-teal-500 via-emerald-600 to-green-700',
+    'organize-manage': 'from-orange-500 via-amber-500 to-rose-600',
+    'optimize-repair': 'from-violet-600 via-indigo-600 to-blue-700',
+    'secure-pdf': 'from-slate-700 via-slate-800 to-cyan-900',
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[hsl(var(--color-background))]">
@@ -240,7 +249,7 @@ export default function HomePageClient({ locale, localizedToolContent }: HomePag
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
               {categoryOrder.map((category) => {
                 const categoryTools = getToolsByCategory(category);
                 const Icon = categoryIcons[category];
@@ -250,29 +259,22 @@ export default function HomePageClient({ locale, localizedToolContent }: HomePag
                 return (
                   <Link
                     key={category}
-                    href={`/${locale}/tools?category=${category}`}
-                    className="group"
+                    href={`/${locale}/tools/category/${category}`}
+                    className={`group relative isolate flex min-h-32 items-center gap-4 overflow-hidden rounded-3xl bg-gradient-to-br ${categoryStyles[category]} p-5 text-white shadow-lg shadow-slate-900/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-blue-400 sm:p-6`}
                   >
-                    <Card className="p-5 h-full glass-card hover:bg-white/80 dark:hover:bg-slate-800/80 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-[hsl(var(--color-border)/0.6)]">
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[hsl(var(--color-primary)/0.1)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                          <Icon className="h-5 w-5 text-[hsl(var(--color-primary))]" aria-hidden="true" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-base text-[hsl(var(--color-foreground))] mb-1 group-hover:text-[hsl(var(--color-primary))] transition-colors">
-                            {categoryName}
-                          </h3>
-                          <p className="text-xs text-[hsl(var(--color-muted-foreground))] line-clamp-2 mb-2">
-                            {categoryDescription}
-                          </p>
-                          <div className="flex items-center text-xs font-medium text-[hsl(var(--color-primary))]">
-                            <span className="bg-[hsl(var(--color-primary)/0.1)] px-2 py-0.5 rounded-md">
-                              {t('home.categoriesSection.toolsCount', { count: categoryTools.length })}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
+                    <span aria-hidden="true" className="pointer-events-none absolute -end-10 -top-16 h-44 w-44 rounded-full bg-white/10 blur-sm transition-transform duration-500 group-hover:scale-125" />
+                    <span aria-hidden="true" className="pointer-events-none absolute -bottom-20 start-1/4 h-36 w-36 rounded-full bg-white/10 blur-2xl" />
+                    <span className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/25 bg-white/20 shadow-inner backdrop-blur-sm transition-transform duration-300 group-hover:scale-110">
+                      <Icon className="h-8 w-8" aria-hidden="true" />
+                    </span>
+                    <span className="relative min-w-0 flex-1">
+                      <span className="mb-1 block text-lg font-bold leading-snug sm:text-xl">{categoryName}</span>
+                      <span className="mb-3 block line-clamp-2 text-sm leading-relaxed text-white/85">{categoryDescription}</span>
+                      <span className="inline-flex rounded-full border border-white/20 bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
+                        {t('home.categoriesSection.toolsCount', { count: categoryTools.length })}
+                      </span>
+                    </span>
+                    <ChevronLeft aria-hidden="true" className={`relative h-6 w-6 shrink-0 opacity-80 transition-transform duration-300 group-hover:-translate-x-1 ${locale === 'ar' ? '' : 'rotate-180'}`} />
                   </Link>
                 );
               })}
