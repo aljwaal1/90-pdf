@@ -86,6 +86,12 @@ describe('Android SAF persistence', () => {
     expect(saf.read).toHaveBeenCalledWith('content://documents/123');
   });
 
+  it('normalizes native SAF reads returned as number arrays', async () => {
+    saf.read.mockResolvedValue([10, 20, 30]);
+    await expect(readFileBytes('content://documents/123'))
+      .resolves.toEqual(new Uint8Array([10, 20, 30]));
+  });
+
   it('rejects non-content destinations for Android writes', async () => {
     await expect(writeFileBytes('/tmp/output.pdf', new Uint8Array([1])))
       .rejects.toThrow('document URI');
