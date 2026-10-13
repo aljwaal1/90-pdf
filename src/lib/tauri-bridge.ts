@@ -129,9 +129,14 @@ export async function saveFile(suggestedName: string, filters: FileFilter[] = []
       pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     };
     try {
-      return await showSaveFilePicker(suggestedName, mime[ext] || 'application/octet-stream');
+      const destination = await showSaveFilePicker(suggestedName, mime[ext] || 'application/octet-stream');
+      if (!destination) return null;
+      if (typeof destination !== 'string' || !destination.startsWith('content://')) {
+        throw new Error('Android SAF did not return a document URI');
+      }
+      return destination;
     } catch (error) {
-      if (/cancel/i.test(String(error))) return null;
+      if (/cancel|dismiss|abort/i.test(String(error))) return null;
       throw error;
     }
   }
