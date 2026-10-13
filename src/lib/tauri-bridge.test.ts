@@ -49,6 +49,16 @@ describe('Android SAF persistence', () => {
     expect(saf.write).not.toHaveBeenCalled();
   });
 
+  it('propagates provider failures instead of silently treating them as cancellation', async () => {
+    saf.pick.mockRejectedValue(new Error('Cannot access provider: abortive failure'));
+    await expect(saveFile('output.pdf')).rejects.toThrow('abortive failure');
+  });
+
+  it('rejects Android reads that are not selected files or content URIs', async () => {
+    await expect(readFileBytes('/sdcard/private.pdf'))
+      .rejects.toThrow('SAF document URIs');
+  });
+
   it('rejects invalid native picker destinations', async () => {
     saf.pick.mockResolvedValue('/storage/emulated/0/output.pdf');
     await expect(saveFile('output.pdf')).rejects.toThrow('document URI');
