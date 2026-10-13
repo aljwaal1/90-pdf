@@ -70,7 +70,7 @@ export async function openFiles(filters: FileFilter[] = []): Promise<string[]> {
     };
     input.addEventListener('change', () => {
       const paths = Array.from(input.files ?? []).map(file => {
-        const browserPath = `__browser__/${typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + '-' + String(browserFileStore.size)}/${file.name}`;
+        const browserPath = `__browser__/${typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + '-' + String(browserFileStore.size) + '-' + String(Math.floor(Math.random() * 1000000))}/${file.name}`;
         browserFileStore.set(browserPath, file);
         return browserPath;
       });
