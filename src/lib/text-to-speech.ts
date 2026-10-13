@@ -18,7 +18,7 @@ let activeSpeech = 0;
 let activeReject: ((reason: Error) => void) | null = null;
 
 function splitSpeechText(text: string, limit = 180): string[] {
-  const words = text.trim().split(/\\s+/u);
+  const words = text.trim().split(/\s+/u);
   const chunks: string[] = [];
   let current = '';
   for (const word of words) {
