@@ -51,6 +51,26 @@ describe('long document speech', () => {
     expect(queued.map(x => x.text).join(' ')).toBe(original);
   });
 
+  it('splits oversized unbroken text without dropping characters', async () => {
+    const original = 'أ'.repeat(510);
+    const completion = speakText(original, { language: 'ar' });
+    let processed = 0;
+    while (processed < queued.length) {
+      const utterance = queued[processed++];
+      expect(utterance.text.length).toBeLessThanOrEqual(180);
+      utterance.onend?.();
+    }
+    await completion;
+    expect(processed).toBe(3);
+    expect(queued.map(x => x.text).join('')).toBe(original);
+  });
+
+  it('rejects speech engine errors instead of reporting success', async () => {
+    const completion = speakText('مرحبا');
+    queued[0].onerror?.({ error: 'voice-unavailable' });
+    await expect(completion).rejects.toThrow('voice-unavailable');
+  });
+
   it('rejects cancelled speech instead of reporting completion', async () => {
     const completion = speakText('one two three');
     stopSpeech();
