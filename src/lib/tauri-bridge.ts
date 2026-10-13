@@ -79,7 +79,11 @@ export async function openFiles(filters: FileFilter[] = []): Promise<string[]> {
     input.addEventListener('cancel', () => finish([]), { once: true });
     window.addEventListener('focus', onFocus);
     document.body.appendChild(input);
-    input.click();
+    try {
+      input.click();
+    } catch {
+      finish([]);
+    }
   });
 }
 
@@ -119,13 +123,18 @@ export function getFiltersForFilename(filename: string): FileFilter[] {
 export async function saveFile(suggestedName: string, filters: FileFilter[] = []): Promise<string | null> {
   if (isAndroidTauri()) {
     const { showSaveFilePicker } = await import('tauri-plugin-android-fs-api');
-    const ext = suggestedName.split('.').pop()?.toLowerCase() || '';
+    const ext = suggestedName.includes('.') ? suggestedName.split('.').pop()?.toLowerCase() || '' : '';
     const mime: Record<string, string> = {
       pdf: 'application/pdf', zip: 'application/zip', txt: 'text/plain',
+      svg: 'image/svg+xml', xls: 'application/vnd.ms-excel',
+      doc: 'application/msword', ppt: 'application/vnd.ms-powerpoint',
       json: 'application/json', csv: 'text/csv', png: 'image/png',
       jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp',
       docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      odt: 'application/vnd.oasis.opendocument.text',
+      ods: 'application/vnd.oasis.opendocument.spreadsheet',
+      odp: 'application/vnd.oasis.opendocument.presentation',
       pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     };
     try {
