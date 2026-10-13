@@ -204,7 +204,7 @@ export async function writeFileBytes(path: string, data: Uint8Array): Promise<vo
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 /**
@@ -285,8 +285,9 @@ export async function saveBlobFile(
   document.body.removeChild(a);
   setTimeout(() => {
     URL.revokeObjectURL(url);
-  }, 1000);
-  return true;
+  }, 60000);
+  // Browsers do not expose a reliable signal that a download was persisted.
+  return false;
 }
 
 /**
