@@ -37,6 +37,22 @@ describe('Android SAF persistence', () => {
     expect(saf.length).toHaveBeenCalledWith('content://documents/123');
   });
 
+  it('uses the correct MIME type for legacy Word documents', async () => {
+    await expect(saveFile('document.doc')).resolves.toBe('content://documents/123');
+    expect(saf.pick).toHaveBeenCalledWith('document.doc', 'application/msword');
+  });
+
+  it('supports OpenDocument files in the native save picker', async () => {
+    await expect(saveFile('report.odt')).resolves.toBe('content://documents/123');
+    expect(saf.pick).toHaveBeenCalledWith('report.odt', 'application/vnd.oasis.opendocument.text');
+  });
+
+  it('saves Blob data rather than only Uint8Array input', async () => {
+    const data = new Blob([new Uint8Array([1, 2, 3, 4])]);
+    await expect(saveBlobFile(data, 'output.pdf')).resolves.toBe(true);
+    expect(saf.write).toHaveBeenCalledWith('content://documents/123', new Uint8Array([1, 2, 3, 4]));
+  });
+
   it('does not write after the picker is cancelled', async () => {
     saf.pick.mockResolvedValue(null);
     await expect(saveBlobFile(new Uint8Array([1]), 'output.pdf')).resolves.toBe(false);
