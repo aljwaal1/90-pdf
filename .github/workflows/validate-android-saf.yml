@@ -1,8 +1,8 @@
-name: Validate Android SAF patch
+name: Validate 90 PDF
 on:
   push:
     branches:
-      - fix/android-saf-rebased-20261013
+      - main
   workflow_dispatch:
 permissions:
   contents: read
