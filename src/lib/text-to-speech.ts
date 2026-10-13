@@ -14,24 +14,66 @@ export function availableVoices(): SpeechSynthesisVoice[] {
   return window.speechSynthesis.getVoices();
 }
 
+let activeSpeech = 0;
+let activeReject: ((reason: Error) => void) | null = null;
+
+function splitSpeechText(text: string, limit = 180): string[] {
+  const words = text.trim().split(/\\s+/u);
+  const chunks: string[] = [];
+  let current = '';
+  for (const word of words) {
+    if (word.length > limit) {
+      if (current) { chunks.push(current); current = ''; }
+      for (let i = 0; i < word.length; i += limit) chunks.push(word.slice(i, i + limit));
+      continue;
+    }
+    if (current && current.length + word.length + 1 > limit) {
+      chunks.push(current);
+      current = word;
+    } else {
+      current = current ? current + ' ' + word : word;
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks;
+}
+
 export function speakText(text: string, options: SpeechOptions = {}): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      reject(new Error('Text-to-speech is not supported by this device'));
-      return;
-    }
-    if (!text.trim()) {
-      reject(new Error('No text available for speech'));
-      return;
-    }
-    const utterance = new SpeechSynthesisUtterance(text.trim());
-    utterance.lang = options.language || 'ar';
-    utterance.rate = options.rate == null || !Number.isFinite(options.rate) ? 1 : Math.min(2, Math.max(0.5, options.rate));
-    utterance.pitch = options.pitch == null || !Number.isFinite(options.pitch) ? 1 : Math.min(2, Math.max(0, options.pitch));
-    utterance.onend = () => resolve();
-    utterance.onerror = (event) => reject(new Error('Speech failed: ' + event.error));
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+    return Promise.reject(new Error('Text-to-speech is not supported by this device'));
+  }
+  if (!text.trim()) return Promise.reject(new Error('No text available for speech'));
+
+  stopSpeech();
+  const id = ++activeSpeech;
+  const chunks = splitSpeechText(text);
+  const rate = options.rate == null || !Number.isFinite(options.rate) ? 1 : Math.min(2, Math.max(0.5, options.rate));
+  const pitch = options.pitch == null || !Number.isFinite(options.pitch) ? 1 : Math.min(2, Math.max(0, options.pitch));
+
+  return new Promise<void>((resolve, reject) => {
+    let index = 0;
+    let finished = false;
+    const finish = (error?: Error) => {
+      if (finished) return;
+      finished = true;
+      if (activeSpeech === id) activeReject = null;
+      if (error) reject(error);
+      else resolve();
+    };
+    activeReject = (error) => finish(error);
+    const next = () => {
+      if (finished || activeSpeech !== id) return;
+      if (index >= chunks.length) { finish(); return; }
+      const utterance = new SpeechSynthesisUtterance(chunks[index++]);
+      utterance.lang = options.language || 'ar';
+      utterance.rate = rate;
+      utterance.pitch = pitch;
+      utterance.onend = next;
+      utterance.onerror = (event) => finish(new Error('Speech failed: ' + event.error));
+      try { window.speechSynthesis.speak(utterance); }
+      catch (error) { finish(error instanceof Error ? error : new Error(String(error))); }
+    };
+    next();
   });
 }
 
@@ -44,5 +86,9 @@ export function resumeSpeech(): void {
 }
 
 export function stopSpeech(): void {
+  activeSpeech++;
+  const rejectPrevious = activeReject;
+  activeReject = null;
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+  rejectPrevious?.(new Error('Speech cancelled'));
 }
