@@ -43,6 +43,9 @@ export function speakText(text: string, options: SpeechOptions = {}): Promise<vo
     return Promise.reject(new Error('Text-to-speech is not supported by this device'));
   }
   if (!text.trim()) return Promise.reject(new Error('No text available for speech'));
+  if (typeof SpeechSynthesisUtterance === 'undefined') {
+    return Promise.reject(new Error('Speech synthesis voice API is not available on this device'));
+  }
 
   stopSpeech();
   const id = ++activeSpeech;
