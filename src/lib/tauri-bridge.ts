@@ -371,6 +371,7 @@ export interface SystemPrinter {
  * In a standard browser environment: returns empty array.
  */
 export async function getSystemPrinters(): Promise<SystemPrinter[]> {
+  if (isAndroidTauri()) return [];
   if (isTauri()) {
     try {
       const invoke = await getTauriInvoke();
