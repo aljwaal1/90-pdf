@@ -7,6 +7,7 @@ import { addRecentFile } from '@/lib/storage/recent-files';
 import { useToolContext } from '@/lib/contexts/ToolContext';
 import { sanitizeFilename } from '@/lib/utils/sanitize';
 import { isTauri, saveBlobFile } from '@/lib/tauri-bridge';
+import { recordToolError } from '@/lib/diagnostics';
 
 export interface DownloadButtonProps extends Omit<ButtonProps, 'onClick' | 'children'> {
   /** Blob data to download */
@@ -112,7 +113,8 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
           }
         }
       } catch (error) {
-        console.error('Failed to save file in desktop app:', error);
+        recordToolError(toolSlug || 'download', 'save', error);
+        console.error('Failed to save file in app:', error);
       } finally {
         setIsDownloading(false);
       }
@@ -149,15 +151,10 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
       }, 100);
     }
 
-    // Mark download as complete
+    // The browser does not expose confirmation of successful disk writes.
+    // Reset button state, but do not claim the file was saved.
     setTimeout(() => {
       setIsDownloading(false);
-      onDownloadComplete?.();
-      
-      // Record to recent files if tool info is provided
-      if (toolSlug && file) {
-        addRecentFile(safeFilename, file.size, toolSlug, toolName);
-      }
     }, 500);
   }, [file, blobUrl, filename, isDownloading, autoRevoke, onDownloadStart, onDownloadComplete, toolSlug, toolName]);
 
