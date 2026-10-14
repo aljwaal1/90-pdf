@@ -101,10 +101,11 @@ describe('Tool Component Property Tests', () => {
           (tool, locale) => {
             const { unmount } = render(<ToolCard tool={tool} locale={locale} />);
             
-            const linkElement = screen.getByTestId('tool-card');
             const expectedUrl = `/${locale}/tools/${tool.slug}`;
+            const card = screen.getByTestId('tool-card');
+            const linkElement = card.querySelector(`a[href="${expectedUrl}"]`);
             
-            expect(linkElement).toHaveAttribute('href', expectedUrl);
+            expect(linkElement).toBeInTheDocument();
             
             unmount();
             return true;
