@@ -201,7 +201,7 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
   totalPages = 1,
 }) => {
   const validLocale = (locale as Locale) || 'en';
-  const isZh = typeof validLocale === 'string' && validLocale.toLowerCase().startsWith('zh');
+  const isZh = validLocale === 'ar';
 
   // Dynamic tool-specific options (aligned across all 67+ tools)
   const [dynamicOptions, setDynamicOptions] = useState<Record<string, any>>({});
@@ -1231,7 +1231,7 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
             <div className="space-y-2.5">
               <div>
                 <label className="text-xs font-semibold text-[hsl(var(--color-foreground))] block mb-1">
-                  {isZh ? '提取页码范围 (如: 1-3, 5, 8)' : 'Pages to Extract (e.g. 1-3, 5)'}
+                  {isZh ? 'نطاق الصفحات المراد استخراجها (如: 1-3, 5, 8)' : 'Pages to Extract (e.g. 1-3, 5)'}
                 </label>
                 <input
                   type="text"
@@ -1444,14 +1444,14 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-semibold text-[hsl(var(--color-foreground))] block mb-1">
-                  {isZh ? '文档密码 / 口令' : 'Document Password'}
+                  {isZh ? 'كلمة مرور المستند' : 'Document Password'}
                 </label>
                 <div className="relative">
                   <input
                     type={showDecryptPassword ? 'text' : 'password'}
                     value={decryptPassword}
                     onChange={(e) => setDecryptPassword(e.target.value)}
-                    placeholder={isZh ? '若有打开密码请输入（无密码请留空）' : 'Enter password if protected'}
+                    placeholder={isZh ? 'أدخل كلمة المرور إن وجدت（无密码请留空）' : 'Enter password if protected'}
                     className="w-full px-3 py-2 pr-9 text-xs rounded-xl border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
                   />
                   <button
@@ -1618,7 +1618,7 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-semibold text-[hsl(var(--color-foreground))] block mb-1.5">
-                  {isZh ? '每张纸拼排页数' : 'Pages per Sheet'}
+                  {isZh ? 'عدد الصفحات في الورقة' : 'Pages per Sheet'}
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {[
@@ -1981,7 +1981,7 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
               {availableDocuments && availableDocuments.length > 0 && (
                 <div className="space-y-1.5 pt-1 border-t border-[hsl(var(--color-border)/0.6)]">
                   <span className="text-[11px] font-semibold text-[hsl(var(--color-foreground))] block">
-                    {isZh ? '快捷并入工作台中已打开的文档：' : 'Or quick-add other open documents:'}
+                    {isZh ? 'إضافة مستند مفتوح:' : 'Or quick-add other open documents:'}
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {availableDocuments.map((doc) => {
@@ -2220,7 +2220,7 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
             disabled={isApplying}
             className="flex-1 text-xs"
           >
-            {isZh ? '取消' : 'Cancel'}
+            {isZh ? 'إلغاء' : 'Cancel'}
           </Button>
           <Button
             type="submit"
@@ -2232,27 +2232,27 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
             {isApplying ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                <span>{isZh ? '处理中...' : 'Processing...'}</span>
+                <span>{isZh ? 'جارٍ المعالجة...' : 'Processing...'}</span>
               </>
             ) : executionType === 'export' ? (
               <>
                 <Download className="w-3.5 h-3.5 mr-1.5" />
-                <span>{isZh ? '开始导出' : 'Export & Save'}</span>
+                <span>{isZh ? 'بدء التصدير' : 'Export & Save'}</span>
               </>
             ) : executionType === 'append' ? (
               <>
                 <Files className="w-3.5 h-3.5 mr-1.5" />
-                <span>{isZh ? '合并追加' : 'Append'}</span>
+                <span>{isZh ? 'دمج وإضافة' : 'Append'}</span>
               </>
             ) : executionType === 'navigate' ? (
               <>
                 <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
-                <span>{isZh ? '打开全屏' : 'Open View'}</span>
+                <span>{isZh ? 'فتح العرض الكامل' : 'Open View'}</span>
               </>
             ) : (
               <>
                 <Check className="w-3.5 h-3.5 mr-1.5" />
-                <span>{isZh ? '应用更改' : 'Apply Changes'}</span>
+                <span>{isZh ? 'تطبيق التغييرات' : 'Apply Changes'}</span>
               </>
             )}
           </Button>
