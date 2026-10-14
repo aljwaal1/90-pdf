@@ -296,7 +296,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={isZh ? '搜索الكل 67+ 工具 (快捷键: /)...' : 'Search 67+ tools (Press /)...'}
+              placeholder={isZh ? 'ابحث في الأدوات (اختصار /)...' : 'Search 67+ tools (Press /)...'}
               data-testid="studio-tool-search"
               className="w-full pl-8 pr-10 py-1.5 text-xs rounded-lg border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] placeholder:text-[hsl(var(--color-muted-foreground)/0.7)] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary)/0.25)] focus:border-[hsl(var(--color-primary))] transition-all"
             />
@@ -420,10 +420,10 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                 <button
                   onClick={toggleAllCategories}
                   className="hover:text-[hsl(var(--color-foreground))] flex items-center gap-1"
-                  title={isZh ? '一键展开或折叠الكل分类' : 'Toggle all categories'}
+                  title={isZh ? 'توسيع أو طي جميع الأقسام' : 'Toggle all categories'}
                 >
                   <ChevronsUpDown className="w-3 h-3" />
-                  <span>{isZh ? '展开/收起الكل' : 'Toggle All'}</span>
+                  <span>{isZh ? 'توسيع/طي الكل' : 'Toggle All'}</span>
                 </button>
               </div>
             )}
@@ -451,7 +451,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                     <p>{isZh ? 'لم يتم العثور على أدوات' : 'No matching tools found'}</p>
                     {activeFilterTab === 'favorites' && (
                       <p className="text-[11px] text-[hsl(var(--color-muted-foreground)/0.8)]">
-                        {isZh ? '点击工具右侧爱心图标即可المفضلة' : 'Click the heart icon on any tool to favorite'}
+                        {isZh ? 'اضغط على القلب لإضافة الأداة للمفضلة' : 'Click the heart icon on any tool to favorite'}
                       </p>
                     )}
                   </div>
@@ -527,7 +527,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                                 ? 'text-white/70 hover:text-white'
                                 : 'text-[hsl(var(--color-muted-foreground))] hover:text-rose-500 opacity-0 group-hover:opacity-100'
                             }`}
-                            title={isFav ? (isZh ? '取消المفضلة' : 'Unfavorite') : (isZh ? '添加المفضلة' : 'Favorite')}
+                            title={isFav ? (isZh ? 'إزالة من المفضلة' : 'Unfavorite') : (isZh ? 'إضافة للمفضلة' : 'Favorite')}
                           >
                             <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-rose-500' : ''}`} />
                           </button>
@@ -549,7 +549,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                         className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
                       >
                         <Clock className="w-3 h-3" />
-                        <span>{isZh ? 'الأخيرة使用' : 'Recently Used'}</span>
+                        <span>{isZh ? 'المستخدمة مؤخرًا' : 'Recently Used'}</span>
                         <span className="text-[10px] font-normal text-[hsl(var(--color-muted-foreground))]">
                           ({recentTools.length})
                         </span>
@@ -558,7 +558,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                         type="button"
                         onClick={handleClearRecent}
                         className="text-[10px] text-[hsl(var(--color-muted-foreground))] hover:text-red-500 transition-colors"
-                        title={isZh ? 'مسحالأخيرة记录' : 'Clear recent records'}
+                        title={isZh ? 'مسح سجل الأدوات الأخيرة' : 'Clear recent records'}
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -601,7 +601,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                       <div className="p-1 rounded-md bg-amber-500/15 text-amber-500 transition-transform group-hover:scale-105 shrink-0">
                         <Star className="w-3.5 h-3.5 fill-current" />
                       </div>
-                      <span className="font-bold text-[hsl(var(--color-foreground))]">{isZh ? 'الأكثر استخدامًا推荐' : 'Featured Tools'}</span>
+                      <span className="font-bold text-[hsl(var(--color-foreground))]">{isZh ? 'الأدوات المقترحة' : 'Featured Tools'}</span>
                     </div>
                     <ChevronDown
                       className={`w-3.5 h-3.5 text-[hsl(var(--color-muted-foreground))] transition-transform duration-200 ${
@@ -679,7 +679,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                                     ? 'text-white/70 hover:text-white'
                                     : 'text-[hsl(var(--color-muted-foreground))] hover:text-rose-500 opacity-0 group-hover:opacity-100'
                                 }`}
-                                title={isFav ? (isZh ? '取消المفضلة' : 'Unfavorite') : (isZh ? '添加المفضلة' : 'Favorite')}
+                                title={isFav ? (isZh ? 'إزالة من المفضلة' : 'Unfavorite') : (isZh ? 'إضافة للمفضلة' : 'Favorite')}
                               >
                                 <Heart className={`w-3 h-3 ${isFav ? 'fill-rose-500' : ''}`} />
                               </button>
@@ -791,7 +791,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                                         ? 'text-white/70 hover:text-white'
                                         : 'text-[hsl(var(--color-muted-foreground))] hover:text-rose-500 opacity-0 group-hover:opacity-100'
                                     }`}
-                                    title={isFav ? (isZh ? '取消المفضلة' : 'Unfavorite') : (isZh ? '添加المفضلة' : 'Favorite')}
+                                    title={isFav ? (isZh ? 'إزالة من المفضلة' : 'Unfavorite') : (isZh ? 'إضافة للمفضلة' : 'Favorite')}
                                   >
                                     <Heart className={`w-3 h-3 ${isFav ? 'fill-rose-500' : ''}`} />
                                   </button>
