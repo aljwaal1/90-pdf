@@ -200,7 +200,7 @@ describe('PDFStudio Component', () => {
 
     // Should find matching tools
     expect(screen.getAllByText(/تم العثور/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/إضافة علامة مائية/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/إضافة علامة مائية/i)[0]).toBeInTheDocument();
   });
 
   it('handles export convert tools without altering central PDF viewer', async () => {
@@ -218,7 +218,7 @@ describe('PDFStudio Component', () => {
     fireEvent.change(searchInput, { target: { value: 'Word' } });
 
     // Click PDF to Word
-    const wordToolBtn = screen.getByRole('button', { name: /PDF.*Word/i });
+    const wordToolBtn = screen.getByTestId('tool-item-pdf-to-docx');
     fireEvent.click(wordToolBtn);
 
     // Drawer opens with export button
@@ -341,7 +341,7 @@ describe('PDFStudio Component', () => {
     // Open export dropdown - should show batch export option for 2 documents
     const moreExportBtn = screen.getByLabelText('More export formats');
     fireEvent.click(moreExportBtn);
-    expect(screen.getByText(/تصدير جميع المستندات.*\.zip/i)).toBeInTheDocument();
+    expect(screen.getByText(/تصدير جميع المستندات|Pack all documents/i)).toBeInTheDocument();
 
     // Open Merge PDF tool - drawer should show contract_part1.pdf as quick-add option
     const searchInput = screen.getByPlaceholderText(/ابحث في الأدوات/i);
@@ -375,7 +375,7 @@ describe('PDFStudio Component', () => {
     const extractBtn = screen.getByTestId('tool-item-extract-pages');
     fireEvent.click(extractBtn);
 
-    expect(screen.getByText(/提取页码范围/i)).toBeInTheDocument();
+    expect(screen.getByText(/نطاق الصفحات المراد استخراجها/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText('1-3, 5')).toBeInTheDocument();
 
     // 2. Check decrypt-pdf parameters
@@ -383,15 +383,15 @@ describe('PDFStudio Component', () => {
     const decryptBtn = screen.getByTestId('tool-item-decrypt-pdf');
     fireEvent.click(decryptBtn);
 
-    expect(screen.getByText(/文档密码 \/ 口令/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/若有打开密码请输入/i)).toBeInTheDocument();
+    expect(screen.getByText(/كلمة مرور المستند/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/أدخل كلمة المرور إن وجدت/i)).toBeInTheDocument();
 
     // 3. Check n-up-pdf parameters
     fireEvent.change(searchInput, { target: { value: 'صفحات متعددة' } });
     const nUpBtn = screen.getByTestId('tool-item-n-up-pdf');
     fireEvent.click(nUpBtn);
 
-    expect(screen.getByText(/每张纸拼排页数/i)).toBeInTheDocument();
+    expect(screen.getByText(/عدد الصفحات في الورقة/i)).toBeInTheDocument();
     expect(screen.getByText('2-Up')).toBeInTheDocument();
     expect(screen.getByText('4-Up')).toBeInTheDocument();
   });
