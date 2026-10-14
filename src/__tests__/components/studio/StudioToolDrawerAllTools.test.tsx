@@ -36,7 +36,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
 
     // Select everyN mode
     fireEvent.click(screen.getByText(/Every N Pages/i));
-    expect(screen.getByText(/Pages per split/i)).toBeInTheDocument();
+    expect(screen.getByText(/Pages Per Chunk/i)).toBeInTheDocument();
 
     // Click submit
     fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
@@ -59,7 +59,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
       />
     );
 
-    expect(screen.getByText(/Table of Contents/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Table of Contents/i)[0]).toBeInTheDocument();
     expect(screen.getByText(/Title/i)).toBeInTheDocument();
     expect(screen.getByText(/bookmark/i)).toBeInTheDocument();
 
@@ -108,7 +108,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
     );
 
     expect(screen.getByText(/Markdown Export Options/i)).toBeInTheDocument();
-    expect(screen.getByText(/page/i)).toBeInTheDocument();
+    expect(screen.getByText(/Include Page Number Headers/i)).toBeInTheDocument();
     expect(screen.getByText(/line breaks/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Export & Save/i }));
@@ -131,7 +131,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
       />
     );
 
-    expect(screen.getByText(/Booklet Layout/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Booklet Layout/i)[0]).toBeInTheDocument();
     expect(screen.getByText(/1x2/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
