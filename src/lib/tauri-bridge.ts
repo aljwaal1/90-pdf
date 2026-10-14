@@ -143,11 +143,13 @@ export async function saveFile(suggestedName: string, filters: FileFilter[] = []
     };
     try {
       const destination = await showSaveFilePicker(suggestedName, mime[ext] || 'application/octet-stream');
-      if (destination == null || destination === '') return null;
-      if (typeof destination !== 'string' || !destination.startsWith('content://')) {
+      if (destination == null) return null;
+      // The Android FS plugin returns a branded FsUri, not a plain string.
+      const uri = String(destination);
+      if (!uri.startsWith('content://')) {
         throw new Error('Android SAF did not return a document URI');
       }
-      return destination;
+      return uri;
     } catch (error) {
       if (/\b(cancelled|canceled|user cancel|dismissed|aborted)\b/i.test(String(error))) return null;
       throw error;
