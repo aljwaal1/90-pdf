@@ -285,7 +285,7 @@ export async function saveBlobFile(
   if (isAndroidTauri()) {
     const destination = await saveFile(suggestedName, activeFilters);
     if (!destination) return false;
-    const bytes = fileData instanceof Uint8Array ? fileData : new Uint8Array(await new Response(fileData).arrayBuffer());
+    const bytes = fileData instanceof Uint8Array ? fileData : new Uint8Array(await fileData.arrayBuffer());
     await writeFileBytes(destination, bytes);
     return true;
   }
