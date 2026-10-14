@@ -47,20 +47,7 @@ export type { Locale } from '@/lib/i18n/config';
 export function getToolContent(locale: Locale, toolId: string): ToolContent | undefined {
   const contentMap: Record<Locale, Record<string, ToolContent>> = {
     en: toolContentEn,
-    ja: toolContentJa,
-    ko: toolContentKo,
-    es: toolContentEs,
-    fr: toolContentFr,
-    de: toolContentDe,
-    zh: toolContentZh,
-    'zh-TW': toolContentZhTW,
-    pt: toolContentPt,
     ar: toolContentAr,
-    it: toolContentIt,
-    id: toolContentId,
-    vi: toolContentVn,
-    ro: toolContentEn, // Fallback to English for Romanian tool content for now
-    pl: toolContentPl,
   };
 
   const localeContent = contentMap[locale];
