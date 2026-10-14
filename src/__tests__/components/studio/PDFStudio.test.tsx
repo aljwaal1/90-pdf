@@ -63,13 +63,13 @@ describe('PDFStudio Component', () => {
     return new File(['%PDF-1.4 dummy content'], name, { type: 'application/pdf' });
   };
 
-  it('renders initial empty workspace with upload dropzone and classic grid switch link in Chinese', () => {
-    render(<PDFStudio locale="zh" />);
+  it('renders initial empty workspace in Arabic', () => {
+    render(<PDFStudio locale="ar" />);
 
     expect(screen.getByText(/PDFCraft/i)).toBeInTheDocument();
-    expect(screen.getByText(/导入 PDF 开启 Studio 工作台/i)).toBeInTheDocument();
-    expect(screen.getByText(/选择 PDF 文件/i)).toBeInTheDocument();
-    expect(screen.getByText(/经典网格视图/i)).toBeInTheDocument();
+    expect(screen.getByText(/استورد PDF لبدء العمل/i)).toBeInTheDocument();
+    expect(screen.getByText(/اختر ملفات PDF/i)).toBeInTheDocument();
+    expect(screen.getByText(/عرض الأدوات/i)).toBeInTheDocument();
   });
 
   it('defaults to English when locale prop is omitted or unsupported', () => {
@@ -92,7 +92,7 @@ describe('PDFStudio Component', () => {
 
   it('renders central viewer and toolbar controls when loaded with initialFile', () => {
     const file = createDummyPdfFile('my-invoice.pdf');
-    render(<PDFStudio locale="zh" initialFile={file} />);
+    render(<PDFStudio locale="ar" initialFile={file} />);
 
     // Shows file name in header
     expect(screen.getByText('my-invoice.pdf')).toBeInTheDocument();
@@ -104,8 +104,8 @@ describe('PDFStudio Component', () => {
     expect(redoBtn).toBeDisabled();
 
     // Print and Export buttons
-    expect(screen.getByText('打印')).toBeInTheDocument();
-    expect(screen.getByText('保存导出')).toBeInTheDocument();
+    expect(screen.getByText('طباعة')).toBeInTheDocument();
+    expect(screen.getByText('حفظ وتصدير')).toBeInTheDocument();
 
     // Iframe with viewer src and title matching file name
     const iframe = screen.getByTitle('my-invoice.pdf');
@@ -115,7 +115,7 @@ describe('PDFStudio Component', () => {
 
   it('collapses and expands left toolbar rail', () => {
     const file = createDummyPdfFile();
-    render(<PDFStudio locale="zh" initialFile={file} />);
+    render(<PDFStudio locale="ar" initialFile={file} />);
 
     const collapseBtn = screen.getByLabelText('Collapse sidebar');
     fireEvent.click(collapseBtn);
@@ -131,20 +131,20 @@ describe('PDFStudio Component', () => {
 
   it('opens tool drawer when clicking a tool icon on the left rail', () => {
     const file = createDummyPdfFile();
-    render(<PDFStudio locale="zh" initialFile={file} />);
+    render(<PDFStudio locale="ar" initialFile={file} />);
 
-    // Click rotate tool (matches 旋转PDF in featured)
-    const rotateBtn = screen.getAllByRole('button', { name: /旋转/i })[0];
+    // Click rotate tool (matches تدويرPDF in featured)
+    const rotateBtn = screen.getAllByRole('button', { name: /تدوير/i })[0];
     fireEvent.click(rotateBtn);
 
     // Tool drawer should open with Apply button and Cancel button
-    expect(screen.getByText('应用更改')).toBeInTheDocument();
-    expect(screen.getByText('取消')).toBeInTheDocument();
+    expect(screen.getByText('تطبيق التغييرات')).toBeInTheDocument();
+    expect(screen.getByText('إلغاء')).toBeInTheDocument();
 
     // Click cancel in drawer
-    const cancelBtn = screen.getByText('取消');
+    const cancelBtn = screen.getByText('إلغاء');
     fireEvent.click(cancelBtn);
-    expect(screen.queryByText('应用更改')).not.toBeInTheDocument();
+    expect(screen.queryByText('تطبيق التغييرات')).not.toBeInTheDocument();
   });
 
   it('executes operation, updates history stack, enables undo and export', async () => {
@@ -152,14 +152,14 @@ describe('PDFStudio Component', () => {
     vi.spyOn(studioProcessors, 'executeStudioOperation').mockResolvedValue(mockOutputBlob);
 
     const file = createDummyPdfFile('sample.pdf');
-    render(<PDFStudio locale="zh" initialFile={file} />);
+    render(<PDFStudio locale="ar" initialFile={file} />);
 
     // Open Rotate tool
-    const rotateBtn = screen.getAllByRole('button', { name: /旋转/i })[0];
+    const rotateBtn = screen.getAllByRole('button', { name: /تدوير/i })[0];
     fireEvent.click(rotateBtn);
 
     // Click Apply
-    const applyBtn = screen.getByText('应用更改');
+    const applyBtn = screen.getByText('تطبيق التغييرات');
     fireEvent.click(applyBtn);
 
     // Wait for operation to complete
@@ -183,7 +183,7 @@ describe('PDFStudio Component', () => {
     });
 
     // Export document
-    const exportBtn = screen.getByText('保存导出');
+    const exportBtn = screen.getByText('حفظ وتصدير');
     fireEvent.click(exportBtn);
 
     await waitFor(() => {
@@ -193,14 +193,14 @@ describe('PDFStudio Component', () => {
 
   it('filters tools by search query in the left rail', () => {
     const file = createDummyPdfFile();
-    render(<PDFStudio locale="zh" initialFile={file} />);
+    render(<PDFStudio locale="ar" initialFile={file} />);
 
-    const searchInput = screen.getByPlaceholderText(/搜索全部 67\+ 工具/i);
-    fireEvent.change(searchInput, { target: { value: '水印' } });
+    const searchInput = screen.getByPlaceholderText(/ابحث في الأدوات/i);
+    fireEvent.change(searchInput, { target: { value: 'علامة مائية' } });
 
     // Should find matching tools
-    expect(screen.getByText(/找到/i)).toBeInTheDocument();
-    expect(screen.getByText(/添加水印/i)).toBeInTheDocument();
+    expect(screen.getByText(/تم العثور/i)).toBeInTheDocument();
+    expect(screen.getByText(/添加علامة مائية/i)).toBeInTheDocument();
   });
 
   it('handles export convert tools without altering central PDF viewer', async () => {
@@ -211,18 +211,18 @@ describe('PDFStudio Component', () => {
     });
 
     const file = createDummyPdfFile('sample.pdf');
-    render(<PDFStudio locale="zh" initialFile={file} />);
+    render(<PDFStudio locale="ar" initialFile={file} />);
 
     // Filter for Word tool
-    const searchInput = screen.getByPlaceholderText(/搜索全部 67\+ 工具/i);
+    const searchInput = screen.getByPlaceholderText(/ابحث في الأدوات/i);
     fireEvent.change(searchInput, { target: { value: 'Word' } });
 
     // Click PDF to Word
-    const wordToolBtn = screen.getByRole('button', { name: /PDF转Word/i });
+    const wordToolBtn = screen.getByRole('button', { name: /PDF.*Word/i });
     fireEvent.click(wordToolBtn);
 
     // Drawer opens with export button
-    const exportBtn = screen.getByText('开始导出');
+    const exportBtn = screen.getByText('بدء التصدير');
     expect(exportBtn).toBeInTheDocument();
     fireEvent.click(exportBtn);
 
@@ -240,10 +240,10 @@ describe('PDFStudio Component', () => {
 
   it('toggles favorite tools and filters via favorites pill', () => {
     const file = createDummyPdfFile();
-    render(<PDFStudio locale="zh" initialFile={file} />);
+    render(<PDFStudio locale="ar" initialFile={file} />);
 
     // Find favorite button for rotate tool
-    const favButtons = screen.getAllByTitle('添加收藏');
+    const favButtons = screen.getAllByTitle('إضافة للمفضلة');
     expect(favButtons.length).toBeGreaterThan(0);
     fireEvent.click(favButtons[0]);
 
@@ -252,7 +252,7 @@ describe('PDFStudio Component', () => {
     fireEvent.click(favPill);
 
     // Should show at least 1 tool in favorites
-    expect(screen.getByText(/找到/i)).toBeInTheDocument();
+    expect(screen.getByText(/تم العثور/i)).toBeInTheDocument();
   });
 
   it('opens history timeline popover and split export dropdown', async () => {
@@ -260,32 +260,32 @@ describe('PDFStudio Component', () => {
     vi.spyOn(studioProcessors, 'executeStudioOperation').mockResolvedValue(mockOutputBlob);
 
     const file = createDummyPdfFile('history-doc.pdf');
-    render(<PDFStudio locale="zh" initialFile={file} />);
+    render(<PDFStudio locale="ar" initialFile={file} />);
 
     // Apply a tool to build history
-    const rotateBtn = screen.getAllByRole('button', { name: /旋转/i })[0];
+    const rotateBtn = screen.getAllByRole('button', { name: /تدوير/i })[0];
     fireEvent.click(rotateBtn);
-    fireEvent.click(screen.getByText('应用更改'));
+    fireEvent.click(screen.getByText('تطبيق التغييرات'));
 
     await waitFor(() => {
       expect(studioProcessors.executeStudioOperation).toHaveBeenCalled();
     });
 
     // Open history popover
-    const historyBadge = screen.getByTitle('查看操作历史记录');
+    const historyBadge = screen.getByTitle('عرض سجل العمليات');
     fireEvent.click(historyBadge);
-    expect(screen.getByText('操作历史时间线')).toBeInTheDocument();
+    expect(screen.getByText('سجل العمليات')).toBeInTheDocument();
 
     // Open export dropdown
     const moreExportBtn = screen.getByLabelText('More export formats');
     fireEvent.click(moreExportBtn);
-    expect(screen.getByText(/导出为 Word/i)).toBeInTheDocument();
-    expect(screen.getByText(/导出为图片包/i)).toBeInTheDocument();
+    expect(screen.getByText(/تصدير إلى Word/i)).toBeInTheDocument();
+    expect(screen.getByText(/تصدير الصور/i)).toBeInTheDocument();
   });
 
   it('renders non-scrolling two-tier filter controls and toggles category filters', () => {
     const file = createDummyPdfFile();
-    render(<PDFStudio locale="zh" initialFile={file} />);
+    render(<PDFStudio locale="ar" initialFile={file} />);
 
     // Tier 1 pills
     expect(screen.getByTestId('filter-pill-all')).toBeInTheDocument();
@@ -299,18 +299,18 @@ describe('PDFStudio Component', () => {
 
     // Click category pill to filter
     fireEvent.click(orgPill);
-    expect(screen.getByText(/找到/i)).toBeInTheDocument();
+    expect(screen.getByText(/تم العثور/i)).toBeInTheDocument();
 
     // Click again to toggle back to all
     fireEvent.click(orgPill);
-    expect(screen.getByText(/按大类浏览/i)).toBeInTheDocument();
+    expect(screen.getByText(/تصفح الأقسام/i)).toBeInTheDocument();
   });
 
   it('supports multi-document tabs, switching active document, and batch ZIP export', async () => {
     const file1 = createDummyPdfFile('contract_part1.pdf');
     const file2 = createDummyPdfFile('contract_part2.pdf');
 
-    render(<PDFStudio locale="zh" />);
+    render(<PDFStudio locale="ar" />);
 
     // Batch load multiple files via file input in empty workspace
     const uploadInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -341,11 +341,11 @@ describe('PDFStudio Component', () => {
     // Open export dropdown - should show batch export option for 2 documents
     const moreExportBtn = screen.getByLabelText('More export formats');
     fireEvent.click(moreExportBtn);
-    expect(screen.getByText(/打包导出全部文档 \(2篇 \.zip\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/تصدير جميع المستندات \(2篇 \.zip\)/i)).toBeInTheDocument();
 
     // Open Merge PDF tool - drawer should show contract_part1.pdf as quick-add option
-    const searchInput = screen.getByPlaceholderText(/搜索全部 67\+ 工具/i);
-    fireEvent.change(searchInput, { target: { value: '合并' } });
+    const searchInput = screen.getByPlaceholderText(/ابحث في الأدوات/i);
+    fireEvent.change(searchInput, { target: { value: 'دمج' } });
 
     const mergeBtn = screen.getByTestId('tool-item-merge-pdf');
     fireEvent.click(mergeBtn);
@@ -366,12 +366,12 @@ describe('PDFStudio Component', () => {
 
   it('renders rich parameters in tool drawer for extract-pages, decrypt-pdf, and n-up-pdf', async () => {
     const file = createDummyPdfFile('test-tools.pdf');
-    render(<PDFStudio locale="zh" initialFile={file} />);
+    render(<PDFStudio locale="ar" initialFile={file} />);
 
-    const searchInput = screen.getByPlaceholderText(/搜索全部 67\+ 工具/i);
+    const searchInput = screen.getByPlaceholderText(/ابحث في الأدوات/i);
 
     // 1. Check extract-pages parameters
-    fireEvent.change(searchInput, { target: { value: '提取页面' } });
+    fireEvent.change(searchInput, { target: { value: 'استخراج الصفحات' } });
     const extractBtn = screen.getByTestId('tool-item-extract-pages');
     fireEvent.click(extractBtn);
 
@@ -379,7 +379,7 @@ describe('PDFStudio Component', () => {
     expect(screen.getByPlaceholderText('1-3, 5')).toBeInTheDocument();
 
     // 2. Check decrypt-pdf parameters
-    fireEvent.change(searchInput, { target: { value: '解密' } });
+    fireEvent.change(searchInput, { target: { value: 'فك الحماية' } });
     const decryptBtn = screen.getByTestId('tool-item-decrypt-pdf');
     fireEvent.click(decryptBtn);
 
@@ -387,7 +387,7 @@ describe('PDFStudio Component', () => {
     expect(screen.getByPlaceholderText(/若有打开密码请输入/i)).toBeInTheDocument();
 
     // 3. Check n-up-pdf parameters
-    fireEvent.change(searchInput, { target: { value: '多页' } });
+    fireEvent.change(searchInput, { target: { value: 'صفحات متعددة' } });
     const nUpBtn = screen.getByTestId('tool-item-n-up-pdf');
     fireEvent.click(nUpBtn);
 
