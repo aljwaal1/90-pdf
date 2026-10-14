@@ -24,7 +24,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
         onApply={onApplyMock}
         onExport={onExportMock}
         isApplying={false}
-        locale="zh"
+        locale="en"
         totalPages={10}
       />
     );
@@ -39,7 +39,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
     expect(screen.getByText('每隔几页拆为一个文档')).toBeInTheDocument();
 
     // Click submit
-    fireEvent.click(screen.getByRole('button', { name: /应用更改/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
     await waitFor(() => {
       expect(onApplyMock).toHaveBeenCalledWith('split-pdf', expect.objectContaining({
         splitMode: 'everyN',
@@ -55,7 +55,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
         onApply={onApplyMock}
         onExport={onExportMock}
         isApplying={false}
-        locale="zh"
+        locale="en"
       />
     );
 
@@ -63,7 +63,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
     expect(screen.getByText('目录标题')).toBeInTheDocument();
     expect(screen.getByText('同步生成 PDF 侧边栏书签')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /应用更改/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
     await waitFor(() => {
       expect(onApplyMock).toHaveBeenCalledWith('table-of-contents', expect.objectContaining({
         title: expect.any(String),
@@ -79,7 +79,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
         onApply={onApplyMock}
         onExport={onExportMock}
         isApplying={false}
-        locale="zh"
+        locale="en"
       />
     );
 
@@ -87,7 +87,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
     expect(screen.getByText('剔除所有可执行 JavaScript 脚本')).toBeInTheDocument();
     expect(screen.getByText('剥离嵌入的内嵌文件附件')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /应用更改/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
     await waitFor(() => {
       expect(onApplyMock).toHaveBeenCalledWith('sanitize-pdf', expect.objectContaining({
         removeJavaScript: true,
@@ -103,7 +103,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
         onApply={onApplyMock}
         onExport={onExportMock}
         isApplying={false}
-        locale="zh"
+        locale="en"
       />
     );
 
@@ -111,7 +111,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
     expect(screen.getByText('在各节标注页码来源注释')).toBeInTheDocument();
     expect(screen.getByText('忠实保留原文物理硬换行')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /开始导出/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Export & Save/i }));
     await waitFor(() => {
       expect(onExportMock).toHaveBeenCalledWith('pdf-to-markdown', expect.objectContaining({
         preserveLineBreaks: true,
@@ -127,14 +127,14 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
         onApply={onApplyMock}
         onExport={onExportMock}
         isApplying={false}
-        locale="zh"
+        locale="en"
       />
     );
 
     expect(screen.getByText('小册子装订拼版')).toBeInTheDocument();
     expect(screen.getByText('1x2 骑马订 (双页并排)')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /应用更改/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
     await waitFor(() => {
       expect(onApplyMock).toHaveBeenCalledWith('pdf-booklet', expect.any(Object));
     });
@@ -148,14 +148,14 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
         onApply={onApplyMock}
         onExport={onExportMock}
         isApplying={false}
-        locale="zh"
+        locale="en"
       />
     );
 
     expect(screen.getByText('文本颜色替换与染色')).toBeInTheDocument();
     expect(screen.getByText('深色字替换')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /应用更改/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
     await waitFor(() => {
       expect(onApplyMock).toHaveBeenCalledWith('text-color', expect.any(Object));
     });
