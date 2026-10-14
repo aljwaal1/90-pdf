@@ -28,6 +28,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
+  vi.restoreAllMocks();
   URL.createObjectURL = originalCreateObjectURL;
   URL.revokeObjectURL = originalRevokeObjectURL;
   cleanup();
@@ -151,7 +153,7 @@ describe('DownloadButton', () => {
       expect(mockOnDownloadStart).toHaveBeenCalled();
     });
 
-    it('calls onDownloadComplete after download', async () => {
+    it('does not report browser download as persisted', async () => {
       vi.useFakeTimers();
       
       const mockBlob = createMockBlob('test content');
@@ -170,7 +172,7 @@ describe('DownloadButton', () => {
       // Fast-forward timers
       vi.advanceTimersByTime(600);
       
-      expect(mockOnDownloadComplete).toHaveBeenCalled();
+      expect(mockOnDownloadComplete).not.toHaveBeenCalled();
       
       vi.useRealTimers();
     });
