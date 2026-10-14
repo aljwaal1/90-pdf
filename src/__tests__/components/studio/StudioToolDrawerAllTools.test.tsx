@@ -32,7 +32,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
     expect(screen.getByText(/Split Mode/i)).toBeInTheDocument();
     expect(screen.getByText(/Custom Ranges/i)).toBeInTheDocument();
     expect(screen.getByText(/Every N Pages/i)).toBeInTheDocument();
-    expect(screen.getByText(/Odd / Even/i)).toBeInTheDocument();
+    expect(screen.getByText(/Odd \/ Even/i)).toBeInTheDocument();
 
     // Select everyN mode
     fireEvent.click(screen.getByText(/Every N Pages/i));
