@@ -2439,13 +2439,13 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
     const getToolTitle = (): string => {
         if (!node) return '';
         if (node.data.toolId === 'condition-gateway') {
-            return locale === 'zh' ? '条件分支配置' : 'Condition Gateway';
+            return locale === 'ar' ? '条件分支配置' : 'Condition Gateway';
         }
         if (node.data.toolId === 'download-pdf') {
-            return tWorkflow('downloadPdf') || (locale === 'zh' ? '下载 PDF' : 'Download PDF');
+            return tWorkflow('downloadPdf') || (locale === 'ar' ? '下载 PDF' : 'Download PDF');
         }
         if (node.data.toolId === 'download-zip') {
-            return tWorkflow('downloadZip') || (locale === 'zh' ? '打包 ZIP 下载' : 'Download ZIP');
+            return tWorkflow('downloadZip') || (locale === 'ar' ? '打包 ZIP 下载' : 'Download ZIP');
         }
         const content = getToolContent(locale, node.data.toolId);
         return content?.title || node.data.label;
@@ -2628,7 +2628,7 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                 {isConditionGateway ? (
                     <div className="space-y-4">
                         <div className="p-3 rounded-lg bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-xs text-indigo-900 dark:text-indigo-200 leading-relaxed">
-                            {locale === 'zh'
+                            {locale === 'ar'
                                 ? '根据流经此节点的文件特征进行规则判定。满足条件的文件流向 True 端口，不满足的文件流向 False 端口。'
                                 : 'Evaluates files dynamically based on your rule. Matching files flow to the True port, otherwise to False.'}
                         </div>
@@ -2636,7 +2636,7 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                         {/* Condition Type */}
                         <div className="space-y-1.5">
                             <label className="block text-sm font-medium text-[hsl(var(--color-foreground))]">
-                                {locale === 'zh' ? '判断维度 (Type)' : 'Dimension'}
+                                {locale === 'ar' ? '判断维度 (Type)' : 'Dimension'}
                             </label>
                             <select
                                 value={(settings.conditionType as string) || 'file-count'}
@@ -2651,16 +2651,16 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                                 }}
                                 className="w-full px-3 py-2 text-sm rounded-md border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
                             >
-                                <option value="file-count">{locale === 'zh' ? '文件数量 (File Count)' : 'File Count'}</option>
-                                <option value="file-size">{locale === 'zh' ? '总文件体积 (File Size)' : 'Total File Size'}</option>
-                                <option value="file-format">{locale === 'zh' ? '文件格式 (File Format / Ext)' : 'File Format / Ext'}</option>
+                                <option value="file-count">{locale === 'ar' ? '文件数量 (File Count)' : 'File Count'}</option>
+                                <option value="file-size">{locale === 'ar' ? '总文件体积 (File Size)' : 'Total File Size'}</option>
+                                <option value="file-format">{locale === 'ar' ? '文件格式 (File Format / Ext)' : 'File Format / Ext'}</option>
                             </select>
                         </div>
 
                         {/* Operator */}
                         <div className="space-y-1.5">
                             <label className="block text-sm font-medium text-[hsl(var(--color-foreground))]">
-                                {locale === 'zh' ? '比较规则 (Operator)' : 'Operator'}
+                                {locale === 'ar' ? '比较规则 (Operator)' : 'Operator'}
                             </label>
                             <select
                                 value={(settings.operator as string) || (settings.conditionType === 'file-format' ? 'equals' : 'greater-than')}
@@ -2669,19 +2669,19 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                             >
                                 {settings.conditionType === 'file-format' ? (
                                     <>
-                                        <option value="equals">{locale === 'zh' ? '等于 (Equals)' : 'Equals'}</option>
-                                        <option value="not-equals">{locale === 'zh' ? '不等于 (Not Equals)' : 'Not Equals'}</option>
-                                        <option value="contains">{locale === 'zh' ? '包含 (Contains)' : 'Contains'}</option>
-                                        <option value="matches">{locale === 'zh' ? '正则匹配 (Regex Matches)' : 'Regex Matches'}</option>
+                                        <option value="equals">{locale === 'ar' ? '等于 (Equals)' : 'Equals'}</option>
+                                        <option value="not-equals">{locale === 'ar' ? '不等于 (Not Equals)' : 'Not Equals'}</option>
+                                        <option value="contains">{locale === 'ar' ? '包含 (Contains)' : 'Contains'}</option>
+                                        <option value="matches">{locale === 'ar' ? '正则匹配 (Regex Matches)' : 'Regex Matches'}</option>
                                     </>
                                 ) : (
                                     <>
-                                        <option value="greater-than">{locale === 'zh' ? '> 大于 (Greater Than)' : '> Greater Than'}</option>
-                                        <option value="less-than">{locale === 'zh' ? '< 小于 (Less Than)' : '< Less Than'}</option>
-                                        <option value="greater-or-equal">{locale === 'zh' ? '≥ 大于等于 (Greater or Equal)' : '≥ Greater or Equal'}</option>
-                                        <option value="less-or-equal">{locale === 'zh' ? '≤ 小于等于 (Less or Equal)' : '≤ Less or Equal'}</option>
-                                        <option value="equals">{locale === 'zh' ? '= 等于 (Equals)' : '= Equals'}</option>
-                                        <option value="not-equals">{locale === 'zh' ? '≠ 不等于 (Not Equals)' : '≠ Not Equals'}</option>
+                                        <option value="greater-than">{locale === 'ar' ? '> 大于 (Greater Than)' : '> Greater Than'}</option>
+                                        <option value="less-than">{locale === 'ar' ? '< 小于 (Less Than)' : '< Less Than'}</option>
+                                        <option value="greater-or-equal">{locale === 'ar' ? '≥ 大于等于 (Greater or Equal)' : '≥ Greater or Equal'}</option>
+                                        <option value="less-or-equal">{locale === 'ar' ? '≤ 小于等于 (Less or Equal)' : '≤ Less or Equal'}</option>
+                                        <option value="equals">{locale === 'ar' ? '= 等于 (Equals)' : '= Equals'}</option>
+                                        <option value="not-equals">{locale === 'ar' ? '≠ 不等于 (Not Equals)' : '≠ Not Equals'}</option>
                                     </>
                                 )}
                             </select>
@@ -2690,7 +2690,7 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                         {/* Value Input */}
                         <div className="space-y-1.5">
                             <label className="block text-sm font-medium text-[hsl(var(--color-foreground))]">
-                                {locale === 'zh' ? '目标阈值 (Target Value)' : 'Target Value'}
+                                {locale === 'ar' ? '目标阈值 (Target Value)' : 'Target Value'}
                             </label>
 
                             {settings.conditionType === 'file-count' && (
@@ -2740,18 +2740,18 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                         {/* Branch Route Explanation */}
                         <div className="mt-4 p-3 rounded-lg border border-[hsl(var(--color-border))] bg-[hsl(var(--color-muted)/0.3)] space-y-2 text-xs">
                             <p className="font-medium text-[hsl(var(--color-foreground))]">
-                                {locale === 'zh' ? '分支流向指引:' : 'Routing Guide:'}
+                                {locale === 'ar' ? '分支流向指引:' : 'Routing Guide:'}
                             </p>
                             <div className="flex items-start gap-1.5 text-emerald-700 dark:text-emerald-300">
                                 <span className="font-bold">✓ True:</span>
-                                <span>{locale === 'zh' ? '满足条件时流入此端口下游节点' : 'Files proceed here if condition is met'}</span>
+                                <span>{locale === 'ar' ? '满足条件时流入此端口下游节点' : 'Files proceed here if condition is met'}</span>
                             </div>
                             <div className="flex items-start gap-1.5 text-amber-700 dark:text-amber-300">
                                 <span className="font-bold">✗ False:</span>
-                                <span>{locale === 'zh' ? '不满足条件时流入此端口下游节点' : 'Files proceed here if condition is not met'}</span>
+                                <span>{locale === 'ar' ? '不满足条件时流入此端口下游节点' : 'Files proceed here if condition is not met'}</span>
                             </div>
                             <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] pt-1 border-t border-[hsl(var(--color-border)/0.5)]">
-                                {locale === 'zh'
+                                {locale === 'ar'
                                     ? '* 执行时未命中的下游分支将被自动跳过并置灰，无需担心额外开销。'
                                     : '* Inactive branch nodes will be skipped during execution.'}
                             </p>
@@ -2804,15 +2804,15 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                                     {field.key === 'filename' && (
                                         <div className="pt-1">
                                             <div className="flex items-center gap-1 text-[11px] text-[hsl(var(--color-muted-foreground))] mb-1">
-                                                <span>{locale === 'zh' ? '点击插入动态变量:' : 'Insert variable:'}</span>
+                                                <span>{locale === 'ar' ? '点击插入动态变量:' : 'Insert variable:'}</span>
                                             </div>
                                             <div className="flex flex-wrap gap-1">
                                                 {[
-                                                    { token: '{filename}', label: '{filename}', desc: locale === 'zh' ? '原文件名' : 'Original file name' },
-                                                    { token: '{date}', label: '{date}', desc: locale === 'zh' ? '当前日期 (YYYY-MM-DD)' : 'Date' },
-                                                    { token: '{time}', label: '{time}', desc: locale === 'zh' ? '当前时间' : 'Time' },
-                                                    { token: '{index}', label: '{index}', desc: locale === 'zh' ? '文件序号' : 'File Index' },
-                                                    { token: '{total}', label: '{total}', desc: locale === 'zh' ? '文件总数' : 'Total Count' },
+                                                    { token: '{filename}', label: '{filename}', desc: locale === 'ar' ? '原文件名' : 'Original file name' },
+                                                    { token: '{date}', label: '{date}', desc: locale === 'ar' ? '当前日期 (YYYY-MM-DD)' : 'Date' },
+                                                    { token: '{time}', label: '{time}', desc: locale === 'ar' ? '当前时间' : 'Time' },
+                                                    { token: '{index}', label: '{index}', desc: locale === 'ar' ? '文件序号' : 'File Index' },
+                                                    { token: '{total}', label: '{total}', desc: locale === 'ar' ? '文件总数' : 'Total Count' },
                                                 ].map(({ token, desc }) => (
                                                     <button
                                                         key={token}
@@ -2859,7 +2859,7 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                                     {field.key === 'position' && field.options?.some(o => o.value === 'top-left' || o.value === 'center') && (
                                         <div className="mb-2 p-2 bg-[hsl(var(--color-muted)/0.4)] rounded-lg border border-[hsl(var(--color-border))]">
                                             <div className="text-[11px] text-[hsl(var(--color-muted-foreground))] mb-1.5 font-medium text-center">
-                                                {locale === 'zh' ? '九宫格快速定位' : 'Position Grid'}
+                                                {locale === 'ar' ? '九宫格快速定位' : 'Position Grid'}
                                             </div>
                                             <div className="grid grid-cols-3 gap-1.5 max-w-[150px] mx-auto">
                                                 {POSITION_GRID_ITEMS.map(pos => {
@@ -3014,7 +3014,7 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                     </Button>
                     <div className="flex items-center gap-2.5">
                         <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                            {locale === 'zh' ? '即时已同步' : 'Auto-synced'}
+                            {locale === 'ar' ? '即时已同步' : 'Auto-synced'}
                         </span>
                         <Button
                             variant="primary"
@@ -3022,7 +3022,7 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                             onClick={handleApply}
                         >
                             <Check className="w-4 h-4 mr-1.5" />
-                            {locale === 'zh' ? '完成' : (tWorkflow('done') || 'Done')}
+                            {locale === 'ar' ? '完成' : (tWorkflow('done') || 'Done')}
                         </Button>
                     </div>
                 </div>
