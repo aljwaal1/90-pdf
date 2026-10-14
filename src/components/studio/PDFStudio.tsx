@@ -693,7 +693,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                           <Download className="w-3.5 h-3.5" />
                           <span>
                             {isZh
-                              ? `打包导出全部文档 (${documents.length}篇 .zip)`
+                              ? `تصدير جميع المستندات (${documents.length} ملفات .zip)`
                               : `Export All Documents (${documents.length} files .zip)`}
                           </span>
                         </button>
