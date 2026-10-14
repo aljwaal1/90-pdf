@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import * as fc from 'fast-check';
-import { render, screen } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import React from 'react';
 import { tools } from '@/config/tools';
 import { locales } from '@/lib/i18n/config';
@@ -42,6 +42,7 @@ describe('Tool Component Property Tests', () => {
           fc.constantFrom(...tools),
           fc.constantFrom(...locales),
           (tool, locale) => {
+            cleanup();
             const { unmount } = render(<ToolCard tool={tool} locale={locale} />);
             
             // Tool card should be rendered
