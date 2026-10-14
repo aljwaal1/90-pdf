@@ -29,14 +29,14 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
       />
     );
 
-    expect(screen.getByText('拆分模式')).toBeInTheDocument();
-    expect(screen.getByText('自定义区间')).toBeInTheDocument();
-    expect(screen.getByText('每隔 N 页')).toBeInTheDocument();
-    expect(screen.getByText('奇偶页拆分')).toBeInTheDocument();
+    expect(screen.getByText(/Split Mode/i)).toBeInTheDocument();
+    expect(screen.getByText(/Custom Ranges/i)).toBeInTheDocument();
+    expect(screen.getByText(/Every N Pages/i)).toBeInTheDocument();
+    expect(screen.getByText(/Odd / Even/i)).toBeInTheDocument();
 
     // Select everyN mode
-    fireEvent.click(screen.getByText('每隔 N 页'));
-    expect(screen.getByText('每隔几页拆为一个文档')).toBeInTheDocument();
+    fireEvent.click(screen.getByText(/Every N Pages/i));
+    expect(screen.getByText(/Pages per split/i)).toBeInTheDocument();
 
     // Click submit
     fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
@@ -59,9 +59,9 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
       />
     );
 
-    expect(screen.getByText('目录生成选项')).toBeInTheDocument();
-    expect(screen.getByText('目录标题')).toBeInTheDocument();
-    expect(screen.getByText('同步生成 PDF 侧边栏书签')).toBeInTheDocument();
+    expect(screen.getByText(/Table of Contents/i)).toBeInTheDocument();
+    expect(screen.getByText(/Title/i)).toBeInTheDocument();
+    expect(screen.getByText(/bookmark/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
     await waitFor(() => {
@@ -83,9 +83,9 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
       />
     );
 
-    expect(screen.getByText('安全深度脱敏项勾选')).toBeInTheDocument();
-    expect(screen.getByText('剔除所有可执行 JavaScript 脚本')).toBeInTheDocument();
-    expect(screen.getByText('剥离嵌入的内嵌文件附件')).toBeInTheDocument();
+    expect(screen.getByText(/Sanitization Scope/i)).toBeInTheDocument();
+    expect(screen.getByText(/JavaScript/i)).toBeInTheDocument();
+    expect(screen.getByText(/attachments/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
     await waitFor(() => {
@@ -107,9 +107,9 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
       />
     );
 
-    expect(screen.getByText('导出 Markdown 结构化选项')).toBeInTheDocument();
-    expect(screen.getByText('在各节标注页码来源注释')).toBeInTheDocument();
-    expect(screen.getByText('忠实保留原文物理硬换行')).toBeInTheDocument();
+    expect(screen.getByText(/Markdown Export Options/i)).toBeInTheDocument();
+    expect(screen.getByText(/page/i)).toBeInTheDocument();
+    expect(screen.getByText(/line breaks/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Export & Save/i }));
     await waitFor(() => {
@@ -131,8 +131,8 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
       />
     );
 
-    expect(screen.getByText('小册子装订拼版')).toBeInTheDocument();
-    expect(screen.getByText('1x2 骑马订 (双页并排)')).toBeInTheDocument();
+    expect(screen.getByText(/Booklet Layout/i)).toBeInTheDocument();
+    expect(screen.getByText(/1x2/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
     await waitFor(() => {
@@ -152,8 +152,8 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
       />
     );
 
-    expect(screen.getByText('文本颜色替换与染色')).toBeInTheDocument();
-    expect(screen.getByText('深色字替换')).toBeInTheDocument();
+    expect(screen.getByText(/Text Color Settings/i)).toBeInTheDocument();
+    expect(screen.getByText(/Dark/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
     await waitFor(() => {
