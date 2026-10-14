@@ -64,22 +64,22 @@ export function ToolSidebar({
     // Helper function to get tool name with fallback using getToolContent
     const getToolName = (toolId: string): string => {
         if (toolId === 'pdf-input') {
-            return tWorkflow('pdfInput') || (locale === 'zh' ? 'PDF 输入源 (PDF Input)' : 'PDF Input');
+            return tWorkflow('pdfInput') || (locale === 'ar' ? 'مصدر PDF' : 'PDF Input');
         }
         if (toolId === 'image-input') {
-            return tWorkflow('imageInput') || (locale === 'zh' ? '图片输入源 (Image Input)' : 'Image Input');
+            return tWorkflow('imageInput') || (locale === 'ar' ? 'مصدر الصور' : 'Image Input');
         }
         if (toolId === 'file-input') {
-            return tWorkflow('fileInput') || (locale === 'zh' ? '通用文件输入 (File Input)' : 'File Input');
+            return tWorkflow('fileInput') || (locale === 'ar' ? 'مصدر الملفات' : 'File Input');
         }
         if (toolId === 'condition-gateway') {
-            return tWorkflow('conditionGateway') || (locale === 'zh' ? '条件分支 (Condition Gateway)' : 'Condition Gateway');
+            return tWorkflow('conditionGateway') || (locale === 'ar' ? 'بوابة الشروط' : 'Condition Gateway');
         }
         if (toolId === 'download-pdf') {
-            return tWorkflow('downloadPdf') || (locale === 'zh' ? '下载 PDF (Download PDF)' : 'Download PDF');
+            return tWorkflow('downloadPdf') || (locale === 'ar' ? 'تنزيل PDF' : 'Download PDF');
         }
         if (toolId === 'download-zip') {
-            return tWorkflow('downloadZip') || (locale === 'zh' ? '打包 ZIP 下载 (Download ZIP)' : 'Download ZIP');
+            return tWorkflow('downloadZip') || (locale === 'ar' ? 'تنزيل ZIP' : 'Download ZIP');
         }
         const content = getToolContent(locale, toolId);
         if (content && content.title) {
@@ -220,15 +220,15 @@ export function ToolSidebar({
         ];
 
         const categoryNames: Record<string, string> = {
-            'input': tWorkflow('inputCategory') || (locale === 'zh' ? '输入源' : 'Input Sources'),
-            'flow-control': tWorkflow('flowControl') || (locale === 'zh' ? '流程控制' : 'Flow Control'),
-            'organize-manage': locale === 'zh' ? '文档组织' : 'Organize & Manage',
-            'edit-annotate': locale === 'zh' ? '编辑与标注' : 'Edit & Annotate',
-            'convert-to-pdf': locale === 'zh' ? '转换为 PDF' : 'Convert to PDF',
-            'convert-from-pdf': locale === 'zh' ? '从 PDF 导出' : 'Convert from PDF',
-            'optimize-repair': locale === 'zh' ? '压缩与优化' : 'Optimize & Repair',
-            'secure-pdf': locale === 'zh' ? '安全与隐私' : 'Security & Privacy',
-            'output': tWorkflow('outputCategory') || (locale === 'zh' ? '输出与交付' : 'Output & Export'),
+            'input': tWorkflow('inputCategory') || (locale === 'ar' ? 'مصادر الإدخال' : 'Input Sources'),
+            'flow-control': tWorkflow('flowControl') || (locale === 'ar' ? 'التحكم في سير العمل' : 'Flow Control'),
+            'organize-manage': locale === 'ar' ? 'تنظيم وإدارة' : 'Organize & Manage',
+            'edit-annotate': locale === 'ar' ? 'التحرير والتعليق' : 'Edit & Annotate',
+            'convert-to-pdf': locale === 'ar' ? 'التحويل إلى PDF' : 'Convert to PDF',
+            'convert-from-pdf': locale === 'ar' ? 'التحويل من PDF' : 'Convert from PDF',
+            'optimize-repair': locale === 'ar' ? 'الضغط والتحسين' : 'Optimize & Repair',
+            'secure-pdf': locale === 'ar' ? 'الأمان والخصوصية' : 'Security & Privacy',
+            'output': tWorkflow('outputCategory') || (locale === 'ar' ? 'التصدير والتنزيل' : 'Output & Export'),
         };
 
         const categoryIcons: Record<string, string> = {
