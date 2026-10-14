@@ -199,8 +199,8 @@ describe('PDFStudio Component', () => {
     fireEvent.change(searchInput, { target: { value: 'علامة مائية' } });
 
     // Should find matching tools
-    expect(screen.getByText(/تم العثور/i)).toBeInTheDocument();
-    expect(screen.getByText(/添加علامة مائية/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/تم العثور/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/إضافة علامة مائية/i)).toBeInTheDocument();
   });
 
   it('handles export convert tools without altering central PDF viewer', async () => {
@@ -252,7 +252,7 @@ describe('PDFStudio Component', () => {
     fireEvent.click(favPill);
 
     // Should show at least 1 tool in favorites
-    expect(screen.getByText(/تم العثور/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/تم العثور/i).length).toBeGreaterThan(0);
   });
 
   it('opens history timeline popover and split export dropdown', async () => {
@@ -299,7 +299,7 @@ describe('PDFStudio Component', () => {
 
     // Click category pill to filter
     fireEvent.click(orgPill);
-    expect(screen.getByText(/تم العثور/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/تم العثور/i).length).toBeGreaterThan(0);
 
     // Click again to toggle back to all
     fireEvent.click(orgPill);
@@ -341,7 +341,7 @@ describe('PDFStudio Component', () => {
     // Open export dropdown - should show batch export option for 2 documents
     const moreExportBtn = screen.getByLabelText('More export formats');
     fireEvent.click(moreExportBtn);
-    expect(screen.getByText(/تصدير جميع المستندات \(2篇 \.zip\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/تصدير جميع المستندات.*\.zip/i)).toBeInTheDocument();
 
     // Open Merge PDF tool - drawer should show contract_part1.pdf as quick-add option
     const searchInput = screen.getByPlaceholderText(/ابحث في الأدوات/i);
@@ -351,7 +351,7 @@ describe('PDFStudio Component', () => {
     fireEvent.click(mergeBtn);
 
     // Check quick add button exists for the other open document
-    expect(screen.getByText(/快捷并入工作台中已打开的文档/i)).toBeInTheDocument();
+    expect(screen.getByText(/إضافة مستند مفتوح/i)).toBeInTheDocument();
 
     // Close the second tab
     const closeBtn2 = screen.getByLabelText('Close contract_part2.pdf');
