@@ -156,7 +156,11 @@ export async function saveFile(suggestedName: string, filters: FileFilter[] = []
   if (isTauri()) {
     try {
       const invoke = await getTauriInvoke();
-      return await invoke<string>('save_file', { suggestedName, filters });
+      const destination = await invoke<unknown>('save_file', { suggestedName, filters });
+      if (typeof destination !== 'string' || !destination.trim()) {
+        throw new Error('Native save dialog returned an invalid destination');
+      }
+      return destination;
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err);
       if (
