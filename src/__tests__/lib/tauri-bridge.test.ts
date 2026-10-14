@@ -74,23 +74,23 @@ describe('tauri-bridge', () => {
   });
 
   describe('saveBlobFile in browser mode', () => {
-    it('triggers anchor download in browser environment', async () => {
+    it('starts browser download without claiming the file was saved', async () => {
       const mockBlob = new Blob(['sample content'], { type: 'application/pdf' });
       const appendChildSpy = vi.spyOn(document.body, 'appendChild');
       const removeChildSpy = vi.spyOn(document.body, 'removeChild');
 
       const result = await saveBlobFile(mockBlob, 'test.pdf');
-      expect(result).toBe(true);
+      expect(result).toBe(false);
       expect(appendChildSpy).toHaveBeenCalled();
       expect(removeChildSpy).toHaveBeenCalled();
     });
 
-    it('supports Uint8Array input in browser environment', async () => {
+    it('starts a Uint8Array browser download without claiming persistence', async () => {
       const data = new Uint8Array([1, 2, 3, 4]);
       const appendChildSpy = vi.spyOn(document.body, 'appendChild');
 
       const result = await saveBlobFile(data, 'data.bin');
-      expect(result).toBe(true);
+      expect(result).toBe(false);
       expect(appendChildSpy).toHaveBeenCalled();
     });
   });
