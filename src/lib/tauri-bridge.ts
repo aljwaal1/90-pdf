@@ -285,7 +285,16 @@ export async function saveBlobFile(
   if (isAndroidTauri()) {
     const destination = await saveFile(suggestedName, activeFilters);
     if (!destination) return false;
-    const bytes = fileData instanceof Uint8Array ? fileData : new Uint8Array(await fileData.arrayBuffer());
+    const bytes = fileData instanceof Uint8Array ? fileData : new Uint8Array(
+      typeof fileData.arrayBuffer === 'function'
+        ? await fileData.arrayBuffer()
+        : await new Promise<ArrayBuffer>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as ArrayBuffer);
+            reader.onerror = () => reject(reader.error ?? new Error('Failed to read Blob'));
+            reader.readAsArrayBuffer(fileData);
+          })
+    );
     await writeFileBytes(destination, bytes);
     return true;
   }
