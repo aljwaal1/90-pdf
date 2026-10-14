@@ -379,7 +379,7 @@ describe('PDFStudio Component', () => {
     expect(screen.getByPlaceholderText('1-3, 5')).toBeInTheDocument();
 
     // 2. Check decrypt-pdf parameters
-    fireEvent.change(searchInput, { target: { value: 'فك الحماية' } });
+    fireEvent.change(searchInput, { target: { value: 'كلمة مرور' } });
     const decryptBtn = screen.getByTestId('tool-item-decrypt-pdf');
     fireEvent.click(decryptBtn);
 
@@ -387,7 +387,7 @@ describe('PDFStudio Component', () => {
     expect(screen.getByPlaceholderText(/أدخل كلمة المرور إن وجدت/i)).toBeInTheDocument();
 
     // 3. Check n-up-pdf parameters
-    fireEvent.change(searchInput, { target: { value: 'صفحات متعددة' } });
+    fireEvent.change(searchInput, { target: { value: 'N-Up' } });
     const nUpBtn = screen.getByTestId('tool-item-n-up-pdf');
     fireEvent.click(nUpBtn);
 
