@@ -168,7 +168,9 @@ describe('Software Updater', () => {
       const result = await checkUpdate({ force: true });
       expect(result.hasUpdate).toBe(true);
       expect(result.latestVersion).toBe('v2026.09.15-xyz');
-      expect(result.matchedAssets.primary?.platformType).toBe('windows-portable');
+      expect(result.release?.assets.some(a => a.platformType === 'windows-portable')).toBe(true);
+      // A Windows download must not be selected on a non-Windows host.
+      expect(result.matchedAssets.primary?.platformType === 'windows-portable').toBe(false);
     });
 
     it('disables update checking when NEXT_PUBLIC_DISABLE_UPDATE_CHECK is true', async () => {
