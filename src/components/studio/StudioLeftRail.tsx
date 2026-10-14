@@ -59,42 +59,42 @@ const CATEGORY_META: Record<
   }
 > = {
   'organize-manage': {
-    labelZh: '页面组织与管理',
+    labelZh: 'تنظيم الصفحات وإدارتها',
     labelEn: 'Organize & Manage',
     icon: FolderOpen,
     accentColor: 'text-blue-500 dark:text-blue-400',
     iconBg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
   },
   'edit-annotate': {
-    labelZh: '编辑与标注',
+    labelZh: 'التحرير والتعليقات',
     labelEn: 'Edit & Annotate',
     icon: Edit,
     accentColor: 'text-emerald-500 dark:text-emerald-400',
     iconBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
   },
   'optimize-repair': {
-    labelZh: '优化与修复',
+    labelZh: 'التحسين والإصلاح',
     labelEn: 'Optimize & Repair',
     icon: Wrench,
     accentColor: 'text-purple-500 dark:text-purple-400',
     iconBg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
   },
   'secure-pdf': {
-    labelZh: '安全与隐私',
+    labelZh: 'الأمان والخصوصية',
     labelEn: 'Secure & Privacy',
     icon: ShieldCheck,
     accentColor: 'text-rose-500 dark:text-rose-400',
     iconBg: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
   },
   'convert-from-pdf': {
-    labelZh: '导出与提取',
+    labelZh: 'التصدير والاستخراج',
     labelEn: 'Convert & Extract',
     icon: FileOutput,
     accentColor: 'text-amber-500 dark:text-amber-400',
     iconBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
   },
   'convert-to-pdf': {
-    labelZh: '转换与追加',
+    labelZh: 'التحويل والإضافة',
     labelEn: 'Convert to PDF',
     icon: FileUp,
     accentColor: 'text-cyan-500 dark:text-cyan-400',
@@ -127,8 +127,8 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
   const [recentToolIds, setRecentToolIds] = useState<string[]>([]);
   const [flyoutCategory, setFlyoutCategory] = useState<string | null>(null);
 
-  const validLocale = (locale as Locale) || 'en';
-  const isZh = typeof validLocale === 'string' && validLocale.toLowerCase().startsWith('zh');
+  const validLocale: Locale = locale === 'ar' ? 'ar' : 'en';
+  const isZh = validLocale === 'ar';
 
   // Load favorites & recent from storage
   useEffect(() => {
@@ -236,19 +236,19 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
   const activeNormId = activeToolId ? normalizeStudioToolId(activeToolId) : null;
 
   const primaryTabs = [
-    { key: 'all', label: isZh ? '全部' : 'All', icon: Sparkles, count: localizedTools.length },
-    { key: 'featured', label: isZh ? '高频' : 'Featured', icon: Star, count: featuredTools.length },
-    { key: 'favorites', label: isZh ? '收藏' : 'Favs', icon: Heart, count: favorites.length },
-    { key: 'recent', label: isZh ? '最近' : 'Recent', icon: Clock, count: recentTools.length },
+    { key: 'all', label: isZh ? 'الكل' : 'All', icon: Sparkles, count: localizedTools.length },
+    { key: 'featured', label: isZh ? 'الأكثر استخدامًا' : 'Featured', icon: Star, count: featuredTools.length },
+    { key: 'favorites', label: isZh ? 'المفضلة' : 'Favs', icon: Heart, count: favorites.length },
+    { key: 'recent', label: isZh ? 'الأخيرة' : 'Recent', icon: Clock, count: recentTools.length },
   ];
 
   const categoryTabs = [
-    { key: 'organize-manage', label: isZh ? '页面' : 'Pages', fullLabel: isZh ? '页面组织与管理' : 'Organize & Manage' },
-    { key: 'edit-annotate', label: isZh ? '标注' : 'Annotate', fullLabel: isZh ? '编辑与标注' : 'Edit & Annotate' },
-    { key: 'optimize-repair', label: isZh ? '优化' : 'Optimize', fullLabel: isZh ? '优化与修复' : 'Optimize & Repair' },
-    { key: 'secure-pdf', label: isZh ? '安全' : 'Security', fullLabel: isZh ? '安全与隐私' : 'Secure & Privacy' },
-    { key: 'convert-from-pdf', label: isZh ? '导出' : 'Export', fullLabel: isZh ? '导出与提取' : 'Convert & Extract' },
-    { key: 'convert-to-pdf', label: isZh ? '追加' : 'Append', fullLabel: isZh ? '转换与追加' : 'Convert to PDF' },
+    { key: 'organize-manage', label: isZh ? 'الصفحات' : 'Pages', fullLabel: isZh ? 'تنظيم الصفحات وإدارتها' : 'Organize & Manage' },
+    { key: 'edit-annotate', label: isZh ? 'تعليقات' : 'Annotate', fullLabel: isZh ? 'التحرير والتعليقات' : 'Edit & Annotate' },
+    { key: 'optimize-repair', label: isZh ? 'تحسين' : 'Optimize', fullLabel: isZh ? 'التحسين والإصلاح' : 'Optimize & Repair' },
+    { key: 'secure-pdf', label: isZh ? 'أمان' : 'Security', fullLabel: isZh ? 'الأمان والخصوصية' : 'Secure & Privacy' },
+    { key: 'convert-from-pdf', label: isZh ? 'تصدير' : 'Export', fullLabel: isZh ? 'التصدير والاستخراج' : 'Convert & Extract' },
+    { key: 'convert-to-pdf', label: isZh ? 'إضافة' : 'Append', fullLabel: isZh ? 'التحويل والإضافة' : 'Convert to PDF' },
   ];
 
   return (
@@ -266,7 +266,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
             </div>
             <div className="flex items-baseline gap-1.5 truncate">
               <span className="text-xs font-bold text-[hsl(var(--color-foreground))] tracking-tight">
-                {isZh ? 'Studio 工具箱' : 'Studio Toolbox'}
+                {isZh ? 'أدوات الاستوديو' : 'Studio Toolbox'}
               </span>
               <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-[hsl(var(--color-primary)/0.1)] text-[hsl(var(--color-primary))]">
                 {STUDIO_TOOLS.length}
@@ -279,7 +279,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
           className={`p-1.5 rounded-lg hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))] transition-colors ${
             isCollapsed ? 'mx-auto' : ''
           }`}
-          title={isCollapsed ? (isZh ? '展开工具栏' : 'Expand Sidebar') : (isZh ? '折叠工具栏' : 'Collapse Sidebar')}
+          title={isCollapsed ? (isZh ? 'توسيع شريط الأدوات' : 'Expand Sidebar') : (isZh ? 'طي شريط الأدوات' : 'Collapse Sidebar')}
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -296,7 +296,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={isZh ? '搜索全部 67+ 工具 (快捷键: /)...' : 'Search 67+ tools (Press /)...'}
+              placeholder={isZh ? '搜索الكل 67+ 工具 (快捷键: /)...' : 'Search 67+ tools (Press /)...'}
               data-testid="studio-tool-search"
               className="w-full pl-8 pr-10 py-1.5 text-xs rounded-lg border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] placeholder:text-[hsl(var(--color-muted-foreground)/0.7)] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary)/0.25)] focus:border-[hsl(var(--color-primary))] transition-all"
             />
@@ -416,14 +416,14 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
             {/* Quick Actions Header Controls (if in all tab) */}
             {activeFilterTab === 'all' && !searchQuery && (
               <div className="flex items-center justify-between px-1.5 py-0.5 text-[10px] text-[hsl(var(--color-muted-foreground))]">
-                <span>{isZh ? '按大类浏览' : 'Browse categories'}</span>
+                <span>{isZh ? 'تصفح الأقسام' : 'Browse categories'}</span>
                 <button
                   onClick={toggleAllCategories}
                   className="hover:text-[hsl(var(--color-foreground))] flex items-center gap-1"
-                  title={isZh ? '一键展开或折叠全部分类' : 'Toggle all categories'}
+                  title={isZh ? '一键展开或折叠الكل分类' : 'Toggle all categories'}
                 >
                   <ChevronsUpDown className="w-3 h-3" />
-                  <span>{isZh ? '展开/收起全部' : 'Toggle All'}</span>
+                  <span>{isZh ? '展开/收起الكل' : 'Toggle All'}</span>
                 </button>
               </div>
             )}
@@ -433,7 +433,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
               <div className="space-y-1">
                 <div className="px-2 py-1 text-[11px] font-semibold text-[hsl(var(--color-muted-foreground))] flex items-center justify-between">
                   <span>
-                    {isZh ? `找到 ${visibleTools.length} 个工具` : `Found ${visibleTools.length} tools`}
+                    {isZh ? `تم العثور على ${visibleTools.length} أداة` : `Found ${visibleTools.length} tools`}
                   </span>
                   {activeFilterTab === 'recent' && recentTools.length > 0 && (
                     <button
@@ -441,17 +441,17 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                       className="text-[10px] text-red-500 hover:underline flex items-center gap-1"
                     >
                       <Trash2 className="w-2.5 h-2.5" />
-                      {isZh ? '清空' : 'Clear'}
+                      {isZh ? 'مسح' : 'Clear'}
                     </button>
                   )}
                 </div>
 
                 {visibleTools.length === 0 ? (
                   <div className="py-12 text-center text-xs text-[hsl(var(--color-muted-foreground))] space-y-2">
-                    <p>{isZh ? '未找到相关工具' : 'No matching tools found'}</p>
+                    <p>{isZh ? 'لم يتم العثور على أدوات' : 'No matching tools found'}</p>
                     {activeFilterTab === 'favorites' && (
                       <p className="text-[11px] text-[hsl(var(--color-muted-foreground)/0.8)]">
-                        {isZh ? '点击工具右侧爱心图标即可收藏' : 'Click the heart icon on any tool to favorite'}
+                        {isZh ? '点击工具右侧爱心图标即可المفضلة' : 'Click the heart icon on any tool to favorite'}
                       </p>
                     )}
                   </div>
@@ -510,7 +510,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                                   ? 'hover:bg-white/20 text-white'
                                   : 'hover:bg-[hsl(var(--color-primary)/0.15)] text-[hsl(var(--color-primary))]'
                               }`}
-                              title={isZh ? '⚡ 零参数一键执行' : '⚡ Instant Run'}
+                              title={isZh ? '⚡ تشغيل فوري' : '⚡ Instant Run'}
                             >
                               <Zap className="w-3.5 h-3.5" />
                             </button>
@@ -527,7 +527,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                                 ? 'text-white/70 hover:text-white'
                                 : 'text-[hsl(var(--color-muted-foreground))] hover:text-rose-500 opacity-0 group-hover:opacity-100'
                             }`}
-                            title={isFav ? (isZh ? '取消收藏' : 'Unfavorite') : (isZh ? '添加收藏' : 'Favorite')}
+                            title={isFav ? (isZh ? '取消المفضلة' : 'Unfavorite') : (isZh ? '添加المفضلة' : 'Favorite')}
                           >
                             <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-rose-500' : ''}`} />
                           </button>
@@ -549,7 +549,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                         className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
                       >
                         <Clock className="w-3 h-3" />
-                        <span>{isZh ? '最近使用' : 'Recently Used'}</span>
+                        <span>{isZh ? 'الأخيرة使用' : 'Recently Used'}</span>
                         <span className="text-[10px] font-normal text-[hsl(var(--color-muted-foreground))]">
                           ({recentTools.length})
                         </span>
@@ -558,7 +558,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                         type="button"
                         onClick={handleClearRecent}
                         className="text-[10px] text-[hsl(var(--color-muted-foreground))] hover:text-red-500 transition-colors"
-                        title={isZh ? '清空最近记录' : 'Clear recent records'}
+                        title={isZh ? 'مسحالأخيرة记录' : 'Clear recent records'}
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -601,7 +601,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                       <div className="p-1 rounded-md bg-amber-500/15 text-amber-500 transition-transform group-hover:scale-105 shrink-0">
                         <Star className="w-3.5 h-3.5 fill-current" />
                       </div>
-                      <span className="font-bold text-[hsl(var(--color-foreground))]">{isZh ? '高频推荐' : 'Featured Tools'}</span>
+                      <span className="font-bold text-[hsl(var(--color-foreground))]">{isZh ? 'الأكثر استخدامًا推荐' : 'Featured Tools'}</span>
                     </div>
                     <ChevronDown
                       className={`w-3.5 h-3.5 text-[hsl(var(--color-muted-foreground))] transition-transform duration-200 ${
@@ -664,7 +664,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                                       ? 'hover:bg-white/20 text-white'
                                       : 'hover:bg-[hsl(var(--color-primary)/0.15)] text-[hsl(var(--color-primary))]'
                                   }`}
-                                  title={isZh ? '⚡ 零参数一键执行' : '⚡ Instant Run'}
+                                  title={isZh ? '⚡ تشغيل فوري' : '⚡ Instant Run'}
                                 >
                                   <Zap className="w-3 h-3" />
                                 </button>
@@ -679,7 +679,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                                     ? 'text-white/70 hover:text-white'
                                     : 'text-[hsl(var(--color-muted-foreground))] hover:text-rose-500 opacity-0 group-hover:opacity-100'
                                 }`}
-                                title={isFav ? (isZh ? '取消收藏' : 'Unfavorite') : (isZh ? '添加收藏' : 'Favorite')}
+                                title={isFav ? (isZh ? '取消المفضلة' : 'Unfavorite') : (isZh ? '添加المفضلة' : 'Favorite')}
                               >
                                 <Heart className={`w-3 h-3 ${isFav ? 'fill-rose-500' : ''}`} />
                               </button>
@@ -776,7 +776,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                                           ? 'hover:bg-white/20 text-white'
                                           : 'hover:bg-[hsl(var(--color-primary)/0.15)] text-[hsl(var(--color-primary))]'
                                       }`}
-                                      title={isZh ? '⚡ 零参数一键执行' : '⚡ Instant Run'}
+                                      title={isZh ? '⚡ تشغيل فوري' : '⚡ Instant Run'}
                                     >
                                       <Zap className="w-3 h-3" />
                                     </button>
@@ -791,7 +791,7 @@ export const StudioLeftRail: React.FC<StudioLeftRailProps> = ({
                                         ? 'text-white/70 hover:text-white'
                                         : 'text-[hsl(var(--color-muted-foreground))] hover:text-rose-500 opacity-0 group-hover:opacity-100'
                                     }`}
-                                    title={isFav ? (isZh ? '取消收藏' : 'Unfavorite') : (isZh ? '添加收藏' : 'Favorite')}
+                                    title={isFav ? (isZh ? '取消المفضلة' : 'Unfavorite') : (isZh ? '添加المفضلة' : 'Favorite')}
                                   >
                                     <Heart className={`w-3 h-3 ${isFav ? 'fill-rose-500' : ''}`} />
                                   </button>
