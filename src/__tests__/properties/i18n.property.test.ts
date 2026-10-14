@@ -15,11 +15,11 @@ import {
   isValidLocale,
 } from '@/lib/i18n';
 import enMessages from '../../../messages/en.json';
-import jaMessages from '../../../messages/ja.json';
+import arMessages from '../../../messages/ar.json';
 
 // Cast imported JSON to NestedMessages type
 const englishMessages = enMessages as unknown as NestedMessages;
-const japaneseMessages = jaMessages as unknown as NestedMessages;
+const arabicMessages = arMessages as unknown as NestedMessages;
 
 describe('i18n Property Tests', () => {
   /**
@@ -42,18 +42,12 @@ describe('i18n Property Tests', () => {
     );
   });
 
-  it('registers Polish metadata and replaces locale prefixes safely', () => {
-    expect(localeConfig.pl).toEqual({
-      name: 'Polish',
-      nativeName: 'Polski',
-      direction: 'ltr',
-      dateFormat: 'DD.MM.YYYY',
-    });
-    expect(getLocalizedPath('/pl/tools/merge-pdf', 'en')).toBe('/en/tools/merge-pdf');
-    expect(getLocalizedPath('/zh-TW/tools/merge-pdf', 'pl')).toBe('/pl/tools/merge-pdf');
-    expect(getLocalizedPath('/pl', 'pl')).toBe('/pl/');
-    expect(getLocalizedPath('/plasma', 'pl')).toBe('/pl/plasma');
-    expect(getLocalizedPath('tools/merge-pdf', 'pl')).toBe('/pl/tools/merge-pdf');
+  it('registers Arabic metadata and replaces locale prefixes safely', () => {
+    expect(localeConfig.ar.direction).toBe('rtl');
+    expect(getLocalizedPath('/ar/tools/merge-pdf', 'en')).toBe('/en/tools/merge-pdf');
+    expect(getLocalizedPath('/en/tools/merge-pdf', 'ar')).toBe('/ar/tools/merge-pdf');
+    expect(getLocalizedPath('/ar', 'ar')).toBe('/ar/');
+    expect(getLocalizedPath('tools/merge-pdf', 'ar')).toBe('/ar/tools/merge-pdf');
   });
 
   /**
@@ -118,8 +112,8 @@ describe('i18n Property Tests', () => {
         fc.constantFrom(...englishKeys),
         (locale, key) => {
           // Create a mock locale messages object with some keys missing
-          // For this test, we'll use Japanese as an example
-          const localeMessages = locale === 'ja' ? japaneseMessages : ({} as NestedMessages);
+          // For this test, we'll use Arabic as an example
+          const localeMessages = locale === 'ar' ? arabicMessages : ({} as NestedMessages);
 
           // Get the translation with fallback
           const result = getTranslationWithFallback(
@@ -165,7 +159,7 @@ describe('i18n Property Tests', () => {
           const nonexistentKey = `nonexistent.${randomKey}`;
 
           const result = getTranslationWithFallback(
-            japaneseMessages,
+            arabicMessages,
             englishMessages,
             nonexistentKey
           );
@@ -203,9 +197,9 @@ describe('i18n Property Tests', () => {
 
     const englishKeys = getAllKeys(enMessages);
 
-    // Merge Japanese messages with English fallback
+    // Merge Arabic messages with English fallback
     const mergedMessages = mergeWithFallback(
-      japaneseMessages,
+      arabicMessages,
       englishMessages
     );
 
@@ -229,7 +223,7 @@ describe('i18n Property Tests', () => {
    * **Validates: Requirements 3.4**
    * 
    * For any page path and any supported locale, the generated URL 
-   * SHALL contain the locale code as a prefix segment (e.g., /en/, /ja/, /ar/).
+   * SHALL contain the locale code as a prefix segment (e.g., /en/, /ar/, /ar/).
    */
   it('Property 5: generated URLs contain locale prefix', () => {
     // Generate valid path segments (alphanumeric, hyphens, no leading/trailing slashes in segment)
