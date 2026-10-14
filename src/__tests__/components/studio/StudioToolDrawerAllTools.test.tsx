@@ -61,7 +61,7 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
 
     expect(screen.getAllByText(/Table of Contents/i)[0]).toBeInTheDocument();
     expect(screen.getByText(/Title/i)).toBeInTheDocument();
-    expect(screen.getByText(/bookmark/i)).toBeInTheDocument();
+    expect(screen.getByText('Generate PDF Outline Bookmark')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
     await waitFor(() => {
