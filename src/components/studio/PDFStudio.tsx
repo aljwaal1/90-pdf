@@ -319,15 +319,18 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         const tempFile = new File([currentBlob], file.name, { type: 'application/pdf' });
         const { blob, filename } = await executeStudioExport(tempFile, toolId, options);
 
-        await saveBlobFile(blob, filename);
+        const saved = await saveBlobFile(blob, filename);
+        if (!saved) {
+          notify('success', isZh
+            ? `تم إنشاء «${filename}». لم يتم تأكيد حفظه؛ اختر مجلدًا واضغط حفظ.`
+            : `Created "${filename}", but saving was not confirmed. Choose a folder and save again.`);
+          return;
+        }
         setActiveToolId(null);
         addStudioRecentTool(toolId);
-        notify(
-          'success',
-          isZh
-            ? `转换导出完成，已触发下载«${filename}»`
-            : `Export completed, downloading "${filename}"`
-        );
+        notify('success', isZh
+          ? `تم حفظ «${filename}» في الموقع الذي اخترته.`
+          : `Saved "${filename}" in your selected location.`);
       } catch (err: any) {
         notify('error', err?.message || (isZh ? 'فشل تحويل الملف وتصديره' : 'Export conversion failed'));
       } finally {
