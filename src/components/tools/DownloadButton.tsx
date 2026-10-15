@@ -69,6 +69,9 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
   const t = useTranslations('common');
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const canPreview = !!file && (/\.pdf$/i.test(filename) || file.type === 'application/pdf');
   
   // Get tool info from context if not provided via props
   const toolContext = useToolContext();
@@ -97,6 +100,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
     if (!file || isDownloading) return;
 
     setIsDownloading(true);
+    setSaveMessage(null);
     onDownloadStart?.();
 
     // Sanitize filename to prevent path traversal
@@ -107,12 +111,16 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
       try {
         const saved = await saveBlobFile(file, safeFilename);
         if (saved) {
+          setSaveMessage('Saved successfully. You can find the file in the folder you selected. / تم الحفظ في المجلد الذي اخترته.');
           onDownloadComplete?.();
           if (toolSlug) {
             addRecentFile(safeFilename, file.size, toolSlug, toolName);
           }
+        } else {
+          setSaveMessage('Save cancelled / تم إلغاء الحفظ');
         }
       } catch (error) {
+        setSaveMessage('Save failed. Please try another folder. / تعذر الحفظ، اختر مجلدًا آخر.');
         recordToolError(toolSlug || 'download', 'save', error);
         console.error('Failed to save file in app:', error);
       } finally {
@@ -151,6 +159,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
       }, 100);
     }
 
+    setSaveMessage('Download requested. Check your browser downloads. / تم طلب التنزيل؛ تحقق من تنزيلات المتصفح.');
     // The browser does not expose confirmation of successful disk writes.
     // Reset button state, but do not claim the file was saved.
     setTimeout(() => {
@@ -166,6 +175,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
   const fileSizeText = showFileSize && file ? ` (${formatFileSize(file.size)})` : '';
 
   return (
+    <div className="inline-flex flex-col gap-2 max-w-full">
     <Button
       variant={variant}
       size={size}
@@ -199,6 +209,22 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
         {fileSizeText}
       </span>
     </Button>
+    {canPreview && blobUrl && (
+      <a href={blobUrl} onClick={(e) => { e.preventDefault(); setPreviewOpen(true); }} className="text-sm underline text-[hsl(var(--color-primary))] cursor-pointer" aria-label="Preview generated PDF">
+        معاينة وفتح PDF / Preview PDF
+      </a>
+    )}
+    {saveMessage && <p role="status" className="text-xs text-[hsl(var(--color-muted-foreground))]">{saveMessage}</p>}
+    {previewOpen && blobUrl && (
+      <div role="dialog" aria-label="PDF preview" className="fixed inset-0 z-[100] bg-black/80 flex flex-col p-3 sm:p-8">
+        <div className="flex items-center justify-between bg-white rounded-t-lg p-3 gap-3">
+          <span className="text-sm text-black truncate">{filename}</span>
+          <button type="button" onClick={() => setPreviewOpen(false)} className="text-black font-semibold px-3 py-1 border rounded" aria-label="Close PDF preview">إغلاق / Close</button>
+        </div>
+        <iframe src={blobUrl} title={`Preview ${filename}`} className="flex-1 w-full bg-white rounded-b-lg" />
+      </div>
+    )}
+    </div>
   );
 };
 
