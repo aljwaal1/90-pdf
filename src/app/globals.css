@@ -307,3 +307,13 @@ select option {
 .scroll-smooth { scroll-behavior: smooth; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* Android/iOS system bars: reserve touch-safe space for all screens. */
+:root {
+  --app-safe-top: env(safe-area-inset-top, 0px);
+  --app-safe-bottom: max(env(safe-area-inset-bottom, 0px), 24px);
+}
+@media (pointer: coarse) and (max-width: 900px) {
+  body { padding-bottom: var(--app-safe-bottom); }
+  .app-mobile-safe-dialog { padding-bottom: calc(var(--app-safe-bottom) + 12px) !important; }
+}
