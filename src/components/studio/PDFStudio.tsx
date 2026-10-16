@@ -545,7 +545,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
   }, [handleUndo, handleRedo, handleExport, handlePrint]);
 
   return (
-    <div className={`h-screen flex flex-col bg-[hsl(var(--color-background))] select-none ${className}`.trim()}>
+    <div className={`h-[100dvh] max-h-[100dvh] pb-[var(--app-safe-bottom)] box-border flex flex-col bg-[hsl(var(--color-background))] select-none ${className}`.trim()}>
       {/* Studio Header (Compact Toolbar - 52px) */}
       <header className="h-[52px] flex-shrink-0 border-b border-[hsl(var(--color-border))] bg-[hsl(var(--color-card)/0.9)] backdrop-blur-md px-4 flex items-center justify-between z-30 relative">
         {/* Left: Brand & File Info */}
@@ -1000,7 +1000,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       </div>
 
       {debugOpen && (
-        <div role="dialog" aria-label="Debug Log" className="fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-3" style={{ paddingBottom: 'calc(3rem + env(safe-area-inset-bottom, 0px))' }}>
+        <div role="dialog" aria-label="Debug Log" className="fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-3 app-mobile-safe-dialog" style={{ paddingBottom: 'calc(3rem + env(safe-area-inset-bottom, 0px))' }}>
           <div className="bg-[hsl(var(--color-card))] text-[hsl(var(--color-foreground))] rounded-xl w-full max-w-2xl max-h-[85vh] flex flex-col p-4 gap-3">
             <h2 className="font-bold">{isZh ? 'سجل العمليات والأخطاء' : 'Operations & Error Log'}</h2>
             <textarea readOnly aria-label="Debug log content" className="w-full flex-1 min-h-[45vh] text-xs font-mono p-2 border rounded bg-[hsl(var(--color-background))]" value={debugEntries.join('\n') || (isZh ? 'لا توجد أحداث بعد' : 'No events yet')} />
