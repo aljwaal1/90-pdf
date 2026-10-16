@@ -875,6 +875,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         {file && pdfUrl ? (
           <>
             {/* Left Rail Toolbar */}
+            <div className={activeToolId ? 'hidden md:flex min-w-0' : 'flex min-w-0'}>
             <StudioLeftRail
               activeToolId={activeToolId}
               onSelectTool={setActiveToolId}
@@ -884,6 +885,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
               locale={validLocale}
               onQuickApply={(toolId) => handleApplyTool(toolId, {})}
             />
+            </div>
 
             {/* Center: Single Seamless PDF Viewer */}
             <main className="flex-1 relative bg-zinc-900/10 dark:bg-black/40 overflow-hidden">
@@ -909,6 +911,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
             </main>
 
             {/* Right: Context Tool Parameter Drawer */}
+            <div className={activeToolId ? 'absolute inset-0 z-40 flex justify-end md:static md:inset-auto md:z-auto' : 'hidden'}>
             <StudioToolDrawer
               toolId={activeToolId}
               onClose={() => setActiveToolId(null)}
@@ -918,6 +921,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
               locale={validLocale}
               availableDocuments={availableDocuments}
             />
+            </div>
           </>
         ) : (
           /* Empty Workspace Welcome & Import Screen */
@@ -990,7 +994,8 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       {notification && (
         <div
           role="status"
-          className={`fixed bottom-6 right-6 px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-medium z-50 animate-in fade-in slide-in-from-bottom-4 duration-300 ${
+          style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}
+          className={`fixed left-3 right-3 sm:left-auto sm:right-6 px-4 py-2.5 max-w-[calc(100vw-1.5rem)] break-words rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-medium z-50 animate-in fade-in slide-in-from-bottom-4 duration-300 ${
             notification.type === 'success'
               ? 'bg-emerald-600 text-white shadow-emerald-600/20'
               : 'bg-red-600 text-white shadow-red-600/20'
