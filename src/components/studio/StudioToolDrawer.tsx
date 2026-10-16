@@ -447,19 +447,15 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
         };
         break;
       case 'page-numbers': {
-        let fmt = '{n}';
-        if (pageNumberFormat === 'page-of-total') fmt = '{n} / {total}';
-        else if (pageNumberFormat === 'roman') fmt = '{roman}';
-        else if (pageNumberFormat === 'custom') fmt = pageNumberCustomFormat;
-
         options = {
           position: pageNumberPos,
-          format: fmt,
+          format: pageNumberFormat,
+          customFormat: pageNumberCustomFormat,
           startNumber: pageNumberStart,
           fontSize: pageNumberFontSize,
           fontColor: pageNumberColor,
           skipFirstPage: pageNumberSkipFirst,
-          oddEvenDifferent: pageNumberOddEvenDifferent,
+          pageMode: pageNumberOddEvenDifferent ? 'odd-even-different' : 'all',
           oddPosition: 'bottom-right',
           evenPosition: 'bottom-left',
         };
