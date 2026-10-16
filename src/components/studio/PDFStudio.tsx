@@ -116,6 +116,8 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
   const [isExportMenuOpen, setIsExportMenuOpen] = useState<boolean>(false);
 
   // Feedback notifications
+  const [debugOpen, setDebugOpen] = useState(false);
+  const [debugEntries, setDebugEntries] = useState<string[]>([]);
   const [notification, setNotification] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -166,6 +168,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
   // Show auto-dismiss notifications
   const notify = useCallback((type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
+    setDebugEntries(prev => [...prev.slice(-199), `[${new Date().toISOString()}] ${type.toUpperCase()}: ${message}`]);
     if (type === 'success') {
       setTimeout(() => {
         setNotification((curr) => (curr?.type === 'success' && curr.message === message ? null : curr));
@@ -461,6 +464,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
 
     try {
       const fileName = file.name.replace(/\.pdf$/i, '_crafted.pdf');
+      setDebugEntries(prev => [...prev.slice(-199), `[${new Date().toISOString()}] START Save & Export: ${fileName} (${currentBlob.size} bytes)`]);
       const isDownloaded = await saveBlobFile(currentBlob, fileName);
       if (isDownloaded) {
         notify(
@@ -469,6 +473,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         );
       }
     } catch (err: any) {
+      setDebugEntries(prev => [...prev.slice(-199), `[${new Date().toISOString()}] SAVE ERROR: ${String(err?.stack || err?.message || err)}`]);
       notify('error', err?.message || (isZh ? 'فشل حفظ المستند وتصديره' : 'Failed to save and export document'));
     }
   }, [currentBlob, file, notify, isZh]);
@@ -617,6 +622,8 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
             )}
           </div>
         )}
+
+        <button type="button" onClick={() => setDebugOpen(true)} aria-label="Open debug log" className="shrink-0 rounded-lg border border-[hsl(var(--color-border))] px-2 py-1.5 text-xs font-semibold">{isZh ? 'سجل الأخطاء' : 'Debug Log'} ({debugEntries.length})</button>
 
         {/* Right: Actions & Mode Switch */}
         <div className="flex items-center gap-2 shrink-0">
@@ -991,6 +998,21 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
           </div>
         )}
       </div>
+
+      {debugOpen && (
+        <div role="dialog" aria-label="Debug Log" className="fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-3" style={{ paddingBottom: 'calc(3rem + env(safe-area-inset-bottom, 0px))' }}>
+          <div className="bg-[hsl(var(--color-card))] text-[hsl(var(--color-foreground))] rounded-xl w-full max-w-2xl max-h-[85vh] flex flex-col p-4 gap-3">
+            <h2 className="font-bold">{isZh ? 'سجل العمليات والأخطاء' : 'Operations & Error Log'}</h2>
+            <textarea readOnly aria-label="Debug log content" className="w-full flex-1 min-h-[45vh] text-xs font-mono p-2 border rounded bg-[hsl(var(--color-background))]" value={debugEntries.join('\\n') || (isZh ? 'لا توجد أحداث بعد' : 'No events yet')} />
+            <div className="flex gap-2 flex-wrap">
+              <button type="button" className="border rounded px-3 py-2" onClick={() => { void navigator.clipboard?.writeText(debugEntries.join('\\n')).catch(() => {}); }}>{isZh ? 'نسخ السجل' : 'Copy Log'}</button>
+              <button type="button" className="border rounded px-3 py-2" onClick={() => { const blob = new Blob([debugEntries.join('\\n')], { type: 'text/plain' }); void saveBlobFile(blob, '90-pdf-debug-log.txt').catch(err => notify('error', String(err))); }}>{isZh ? 'حفظ السجل' : 'Save Log'}</button>
+              <button type="button" className="border rounded px-3 py-2" onClick={() => setDebugEntries([])}>{isZh ? 'مسح' : 'Clear'}</button>
+              <button type="button" className="border rounded px-3 py-2" onClick={() => setDebugOpen(false)}>{isZh ? 'إغلاق' : 'Close'}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast Notification */}
       {notification && (
