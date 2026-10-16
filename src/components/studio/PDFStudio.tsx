@@ -166,9 +166,11 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
   // Show auto-dismiss notifications
   const notify = useCallback((type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
-    setTimeout(() => {
-      setNotification((curr) => (curr?.message === message ? null : curr));
-    }, 3000);
+    if (type === 'success') {
+      setTimeout(() => {
+        setNotification((curr) => (curr?.type === 'success' && curr.message === message ? null : curr));
+      }, 5000);
+    }
   }, []);
 
   // Handle loading multiple files (or single file)
@@ -994,8 +996,8 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       {notification && (
         <div
           role="status"
-          style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}
-          className={`fixed left-3 right-3 sm:left-auto sm:right-6 px-4 py-2.5 max-w-[calc(100vw-1.5rem)] break-words rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-medium z-50 animate-in fade-in slide-in-from-bottom-4 duration-300 ${
+          style={{ bottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}
+          className={`fixed left-3 right-3 sm:left-auto sm:right-6 px-4 py-3 max-w-[calc(100vw-1.5rem)] max-h-[45vh] overflow-y-auto break-words rounded-xl shadow-2xl flex items-start gap-2.5 text-sm font-medium z-[100] animate-in fade-in slide-in-from-bottom-4 duration-300 ${
             notification.type === 'success'
               ? 'bg-emerald-600 text-white shadow-emerald-600/20'
               : 'bg-red-600 text-white shadow-red-600/20'
@@ -1006,7 +1008,9 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
           ) : (
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
           )}
-          <span>{notification.message}</span>
+          <span className="flex-1 whitespace-pre-wrap select-text">{notification.message}</span>
+          <button type="button" aria-label="Copy notification" onClick={() => { void navigator.clipboard?.writeText(notification.message).catch(() => {}); }} className="shrink-0 rounded border border-white/50 px-2 py-1 text-xs">نسخ</button>
+          <button type="button" aria-label="Dismiss notification" onClick={() => setNotification(null)} className="shrink-0 rounded border border-white/50 px-2 py-1 text-xs">إغلاق</button>
         </div>
       )}
     </div>
