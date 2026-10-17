@@ -165,7 +165,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, locale 
       <div
         ref={menuRef}
         className={`
-          fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-[hsl(var(--color-background))] 
+          fixed top-0 right-0 h-[100dvh] max-h-[100dvh] pb-[var(--app-safe-bottom,24px)] pt-[var(--app-safe-top,0px)] box-border overflow-y-auto w-80 max-w-[85vw] bg-[hsl(var(--color-background))] 
           shadow-xl z-50 md:hidden
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
