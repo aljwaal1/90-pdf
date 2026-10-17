@@ -16,7 +16,7 @@ vi.mock('tauri-plugin-android-fs-api', () => ({
 
 import { getSystemPrinters, printPdfFile, readFileBytes, saveBlobFile, saveFile, writeFileBytes } from './tauri-bridge';
 
-describe('Android SAF persistence', () => {
+describe('Android SAF persistence and verification', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     vi.stubGlobal('window', { __TAURI_INTERNALS__: {} });
