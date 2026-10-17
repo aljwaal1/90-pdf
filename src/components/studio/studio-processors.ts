@@ -698,6 +698,27 @@ export async function executeStudioExport(
     throw new Error(output.error?.message || 'Export failed');
   }
 
+  // Multiple processor outputs must never be silently reduced to the first file.
+  // Package them as ZIP so the existing save dialog can preserve every result.
+  if (Array.isArray(output.result) && output.result.length > 1) {
+    const JSZip = (await import('jszip')).default;
+    const archive = new JSZip();
+    for (let index = 0; index < output.result.length; index++) {
+      const item = output.result[index];
+      if (!(item instanceof Blob)) {
+        throw new Error(`Unsupported multi-file output at index ${index}`);
+      }
+      const name = item instanceof File && item.name
+        ? item.name
+        : `${baseName}_converted_${index + 1}.${targetExtension}`;
+      archive.file(`${index + 1}_${name.replace(/[\\/]/g, '_')}`, item);
+    }
+    return {
+      blob: await archive.generateAsync({ type: 'blob' }),
+      filename: `${baseName}_converted_files.zip`,
+    };
+  }
+
   let finalBlob: Blob;
   if (output.result instanceof Blob) {
     finalBlob = output.result;
