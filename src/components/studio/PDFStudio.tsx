@@ -204,7 +204,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       notify(
         'success',
         isZh
-          ? `已成功载入 ${newDocs.length} 个 PDF 文档`
+          ? `تم تحميل ${newDocs.length} مستند PDF بنجاح`
           : `Successfully loaded ${newDocs.length} PDF document(s)`
       );
     },
@@ -232,7 +232,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
           if (
             !window.confirm(
               isZh
-                ? `文档«${targetDoc.name}»包含未保存的修改，确定要关闭吗？`
+                ? `المستند «${targetDoc.name}» يحتوي على تعديلات غير محفوظة. هل تريد إغلاقه؟`
                 : `Document "${targetDoc.name}" contains unsaved changes. Are you sure you want to close it?`
             )
           ) {
@@ -300,7 +300,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         notify(
           'success',
           isZh
-            ? `已就地应用«${toolName}»，可在左侧继续选择下一项عمليات`
+            ? `تم تطبيق «${toolName}» بنجاح. يمكنك اختيار أداة أخرى.`
             : `Applied "${toolName}" in-place. Select another action on the left`
         );
       } catch (err: any) {
@@ -406,7 +406,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
     if (
       window.confirm(
         isZh
-          ? `确定要放弃文档«${activeDoc.name}»的所有更改，استعادة到最初上传的版本吗？`
+          ? `هل تريد تجاهل جميع تعديلات «${activeDoc.name}» واستعادة النسخة الأصلية؟`
           : `Discard all changes to "${activeDoc.name}" and revert to the original version?`
       )
     ) {
@@ -474,12 +474,16 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
     try {
       const fileName = file.name.replace(/\.pdf$/i, '_crafted.pdf');
       setDebugEntries(prev => [...prev.slice(-199), `[${new Date().toISOString()}] START Save & Export: ${fileName} (${currentBlob.size} bytes)`]);
+      setPendingExport({ blob: currentBlob, filename: fileName });
       const isDownloaded = await saveBlobFile(currentBlob, fileName);
       if (isDownloaded) {
+        setPendingExport(null);
         notify(
           'success',
           isZh ? `تم حفظ المستند وتصديره«${fileName}»` : `Document saved and exported as "${fileName}"`
         );
+      } else {
+        notify('error', isZh ? 'لم يُحفظ المستند. يمكنك إعادة المحاولة من لوحة النتائج.' : 'Document not saved. Retry from the results panel.');
       }
     } catch (err: any) {
       setDebugEntries(prev => [...prev.slice(-199), `[${new Date().toISOString()}] SAVE ERROR: ${String(err?.stack || err?.message || err)}`]);
@@ -729,7 +733,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                       className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs text-left rounded-lg hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] font-medium transition-colors"
                     >
                       <Printer className="w-3.5 h-3.5 text-zinc-400" />
-                      <span>{isZh ? '原生طباعة (Ctrl+P)' : 'Native Print (Ctrl+P)'}</span>
+                      <span>{isZh ? 'طباعة (Ctrl+P)' : 'Native Print (Ctrl+P)'}</span>
                     </button>
                   </div>
                 )}
@@ -827,7 +831,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                       ? 'bg-[hsl(var(--color-card))] text-[hsl(var(--color-primary))] border-[hsl(var(--color-border))] shadow-xs font-semibold'
                       : 'bg-transparent text-[hsl(var(--color-muted-foreground))] border-transparent hover:bg-[hsl(var(--color-card)/0.6)] hover:text-[hsl(var(--color-foreground))]'
                   }`}
-                  title={isZh ? `文档: ${doc.name}${isModified ? ' (معدل)' : ''}` : `Document: ${doc.name}${isModified ? ' (Modified)' : ''}`}
+                  title={isZh ? `المستند: ${doc.name}${isModified ? ' (معدل)' : ''}` : `Document: ${doc.name}${isModified ? ' (Modified)' : ''}`}
                 >
                   <FileText
                     className={`w-3.5 h-3.5 shrink-0 ${
@@ -972,7 +976,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
               </h2>
               <p className="text-xs text-[hsl(var(--color-muted-foreground))] mb-6 leading-relaxed">
                 {isZh
-                  ? '无需在不同工具页面反复跳转和重新上传。在单一视图中就地旋转、加水印、压缩、签名、提取页面，一气呵成。'
+                  ? 'اعمل على ملف PDF في مكان واحد: تدوير الصفحات، وإضافة العلامات المائية، والضغط، والتوقيع، واستخراج الصفحات دون إعادة رفع الملف.'
                   : 'No more jumping between tools or re-uploading. Rotate, watermark, compress, sign, and organize pages seamlessly in a single in-place view.'}
               </p>
 
