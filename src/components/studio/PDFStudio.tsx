@@ -118,6 +118,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
   // Feedback notifications
   const [debugOpen, setDebugOpen] = useState(false);
   const [debugEntries, setDebugEntries] = useState<string[]>([]);
+  const [pendingExport, setPendingExport] = useState<{ blob: Blob; filename: string } | null>(null);
   const [notification, setNotification] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -323,14 +324,16 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       try {
         const tempFile = new File([currentBlob], file.name, { type: 'application/pdf' });
         const { blob, filename } = await executeStudioExport(tempFile, toolId, options);
+        setPendingExport({ blob, filename });
 
         const saved = await saveBlobFile(blob, filename);
         if (!saved) {
-          notify('success', isZh
-            ? `تم إنشاء «${filename}». لم يتم تأكيد حفظه؛ اختر مجلدًا واضغط حفظ.`
-            : `Created "${filename}", but saving was not confirmed. Choose a folder and save again.`);
+          notify('error', isZh
+            ? `تم إنشاء «${filename}» ولكن لم يُحفظ. يمكنك إعادة المحاولة من لوحة النتائج.`
+            : `Created "${filename}" but not saved. Retry from the results panel.`);
           return;
         }
+        setPendingExport(null);
         setActiveToolId(null);
         addStudioRecentTool(toolId);
         notify('success', isZh
@@ -443,11 +446,17 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       }
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       const zipName = `pdfcraft_studio_batch_${Date.now()}.zip`;
-      await saveBlobFile(zipBlob, zipName);
+      setPendingExport({ blob: zipBlob, filename: zipName });
+      const saved = await saveBlobFile(zipBlob, zipName);
+      if (!saved) {
+        notify('error', isZh ? 'تم تجهيز ZIP ولم يُحفظ. أعد المحاولة من لوحة النتائج.' : 'ZIP created but not saved. Retry from results.');
+        return;
+      }
+      setPendingExport(null);
       notify(
         'success',
         isZh
-          ? `成功打包并导出全部 ${documents.length} مستندات`
+          ? `تم حفظ الملف المضغوط الذي يحتوي على ${documents.length} مستندات`
           : `Packaged and exported all ${documents.length} documents`
       );
     } catch (err: any) {
@@ -1010,6 +1019,17 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
               <button type="button" className="border rounded px-3 py-2" onClick={() => setDebugEntries([])}>{isZh ? 'مسح' : 'Clear'}</button>
               <button type="button" className="border rounded px-3 py-2" onClick={() => setDebugOpen(false)}>{isZh ? 'إغلاق' : 'Close'}</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {pendingExport && (
+        <div role="region" aria-label={isZh ? 'نتيجة جاهزة للحفظ' : 'Output ready to save'} className="fixed z-[150] left-3 right-3 sm:left-auto sm:right-6 sm:max-w-md rounded-xl border bg-[hsl(var(--color-card))] text-[hsl(var(--color-foreground))] shadow-xl p-3 flex flex-col gap-2" style={{ bottom: 'calc(10rem + var(--app-safe-bottom, 24px))' }}>
+          <div className="font-semibold text-sm">{isZh ? 'ملف جاهز للحفظ' : 'Output ready to save'}</div>
+          <div className="text-xs break-all">{pendingExport.filename} · {(pendingExport.blob.size / 1024).toFixed(1)} KB</div>
+          <div className="flex gap-2 flex-wrap">
+            <button type="button" disabled={isApplying} className="rounded bg-[hsl(var(--color-primary))] text-white px-3 py-2 text-sm disabled:opacity-50" onClick={async () => { const item = pendingExport; if (!item) return; setIsApplying(true); try { const saved = await saveBlobFile(item.blob, item.filename); if (saved) { setPendingExport(null); notify('success', isZh ? 'تم حفظ الملف' : 'File saved'); } else { notify('error', isZh ? 'لم يتم حفظ الملف' : 'File was not saved'); } } catch (err) { notify('error', String(err)); } finally { setIsApplying(false); } }}>{isZh ? 'إعادة الحفظ' : 'Retry save'}</button>
+            <button type="button" className="rounded border px-3 py-2 text-sm" onClick={() => setPendingExport(null)}>{isZh ? 'تجاهل النتيجة' : 'Discard output'}</button>
           </div>
         </div>
       )}
