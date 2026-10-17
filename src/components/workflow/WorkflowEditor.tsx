@@ -589,7 +589,7 @@ function WorkflowEditorContent() {
 
             const hasLocalFiles = inputNodes.some(n => n.data.inputFiles && n.data.inputFiles.length > 0);
             if (inputFiles.length === 0 && !hasLocalFiles) {
-                throw new Error('请先上传文件（可在顶部面板上传，或直接在输入节点卡片中上传）');
+                throw new Error('Please upload a file using the top panel or an input node before running the workflow.');
             }
 
             logger.log(
