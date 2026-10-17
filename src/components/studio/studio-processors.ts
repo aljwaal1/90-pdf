@@ -559,10 +559,16 @@ export async function executeStudioOperation(
   }
 
   if (Array.isArray(output.result)) {
-    return output.result[0] as Blob;
+    if (output.result.length !== 1 || !(output.result[0] instanceof Blob)) {
+      throw new Error('This operation produced multiple files. Use the dedicated export tool to save every result.');
+    }
+    return output.result[0];
   }
 
-  return output.result as Blob;
+  if (!(output.result instanceof Blob)) {
+    throw new Error('The operation did not produce a valid PDF document.');
+  }
+  return output.result;
 }
 
 /**
