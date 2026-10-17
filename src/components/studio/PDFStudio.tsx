@@ -895,7 +895,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       )}
 
       {/* Main Workspace Body */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 min-h-0 flex overflow-hidden relative">
         {file && pdfUrl ? (
           <>
             {/* Left Rail Toolbar */}
@@ -912,7 +912,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
             </div>
 
             {/* Center: Single Seamless PDF Viewer */}
-            <main className="flex-1 relative bg-zinc-900/10 dark:bg-black/40 overflow-hidden">
+            <main className="flex-1 min-w-0 min-h-0 relative bg-zinc-900/10 dark:bg-black/40 overflow-hidden">
               <iframe
                 ref={iframeRef}
                 src={withBasePath(`/pdfjs-viewer/viewer.html?file=${encodeURIComponent(pdfUrl)}`)}
@@ -935,7 +935,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
             </main>
 
             {/* Right: Context Tool Parameter Drawer */}
-            <div className={activeToolId ? 'absolute inset-0 z-40 flex justify-end md:static md:inset-auto md:z-auto' : 'hidden'}>
+            <div className={activeToolId ? 'absolute inset-0 z-40 flex justify-end bg-black/40 md:bg-transparent md:static md:inset-auto md:z-auto' : 'hidden'}>
             <StudioToolDrawer
               toolId={activeToolId}
               onClose={() => setActiveToolId(null)}
