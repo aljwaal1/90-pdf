@@ -41,7 +41,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, locale 
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
 
   const categories: CategoryItem[] = [
     { id: 'edit-annotate', labelKey: 'editAnnotate', href: `/${locale}/tools?category=edit-annotate` },
@@ -124,22 +124,21 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, locale 
 
   // Touch gesture handling for swipe to close
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    setTouchStart(e.touches[0].clientX);
+    setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
   }, []);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     if (touchStart === null) return;
     
-    const touchEnd = e.changedTouches[0].clientX;
-    const diff = touchStart - touchEnd;
-    
-    // Swipe left to close (for LTR) - threshold of 100px
-    if (diff > 100) {
+    const deltaX = e.changedTouches[0].clientX - touchStart.x;
+    const deltaY = e.changedTouches[0].clientY - touchStart.y;
+    // Close toward the drawer's physical edge; ignore vertical scrolling.
+    const towardEdge = locale === 'ar' ? deltaX < -100 : deltaX > 100;
+    if (towardEdge && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
       onClose();
     }
-    
     setTouchStart(null);
-  }, [touchStart, onClose]);
+  }, [touchStart, onClose, locale]);
 
   const handleCategoryToggle = useCallback((categoryId: string) => {
     setExpandedCategory((prev) => (prev === categoryId ? null : categoryId));
@@ -165,12 +164,14 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, locale 
       <div
         ref={menuRef}
         className={`
-          fixed top-0 right-0 h-[100dvh] max-h-[100dvh] pb-[var(--app-safe-bottom,24px)] pt-[var(--app-safe-top,0px)] box-border overflow-y-auto w-80 max-w-[85vw] bg-[hsl(var(--color-background))] 
+          fixed top-0 h-[100dvh] max-h-[100dvh] pb-[var(--app-safe-bottom,24px)] pt-[var(--app-safe-top,0px)] box-border overflow-hidden flex flex-col w-80 max-w-[85vw] bg-[hsl(var(--color-background))] 
           shadow-xl z-50 md:hidden
+          ${locale === 'ar' ? 'left-0' : 'right-0'}
           transform transition-transform duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : 'translate-x-full'}
+          ${isOpen ? 'translate-x-0' : locale === 'ar' ? '-translate-x-full' : 'translate-x-full'}
         `}
         role="dialog"
+        dir={locale === 'ar' ? 'rtl' : 'ltr'}
         aria-modal="true"
         aria-label="Mobile navigation menu"
         onTouchStart={handleTouchStart}
@@ -193,7 +194,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, locale 
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 overflow-y-auto h-[calc(100%-64px)]" aria-label="Mobile navigation">
+        <nav className="p-4 flex-1 min-h-0 overflow-y-auto overscroll-contain" aria-label="Mobile navigation">
           <ul className="flex flex-col gap-1">
             {mainNavItems.map((item) => (
               <li key={item.href}>
@@ -201,7 +202,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, locale 
                   <div>
                     <button
                       onClick={() => handleCategoryToggle('tools')}
-                      className="flex items-center justify-between w-full px-4 py-3 text-left text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-muted))] rounded-[var(--radius-md)] transition-colors"
+                      className="flex items-center justify-between w-full px-4 py-3 text-start text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-muted))] rounded-[var(--radius-md)] transition-colors"
                       aria-expanded={expandedCategory === 'tools'}
                     >
                       <span className="font-medium">{item.label}</span>
@@ -214,14 +215,14 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, locale 
                     
                     {/* Submenu */}
                     {expandedCategory === 'tools' && (
-                      <ul className="ml-4 mt-1 border-l-2 border-[hsl(var(--color-border))]">
+                      <ul className="ms-4 mt-1 border-s-2 border-[hsl(var(--color-border))]">
                         <li>
                           <Link
                             href={item.href}
                             className="block px-4 py-2 text-sm text-[hsl(var(--color-foreground))] hover:text-[hsl(var(--color-primary))] hover:bg-[hsl(var(--color-muted))] rounded-[var(--radius-md)] transition-colors"
                             onClick={handleLinkClick}
                           >
-                            All Tools
+                            {tCommon('navigation.tools')}
                           </Link>
                         </li>
                         {categories.map((category) => (
