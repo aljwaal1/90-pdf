@@ -3,6 +3,8 @@
  * Provides a unified interface for file operations in both Tauri and Browser environments.
  */
 
+import { recordToolError } from '@/lib/diagnostics';
+
 export interface FileFilter {
   name: string;
   extensions: string[];
@@ -151,7 +153,7 @@ export async function saveFile(suggestedName: string, filters: FileFilter[] = []
       }
       return uri;
     } catch (error) {
-      if (/\b(cancelled|canceled|user cancel|dismissed|aborted)\b/i.test(String(error))) return null;
+      if (/^(?:user\s+)?(?:cancelled|canceled|dismissed|aborted)(?:\s+(?:by\s+user|picker))?\.?$/i.test(error instanceof Error ? error.message.trim() : String(error).trim())) return null;
       throw error;
     }
   }
@@ -223,10 +225,25 @@ export async function writeFileBytes(path: string, data: Uint8Array): Promise<vo
   if (isAndroidTauri()) {
     if (!path.startsWith('content://')) throw new Error('Android SAF document URI required');
     const { writeFile, getFileByteLength } = await import('tauri-plugin-android-fs-api');
-    await writeFile(path, data);
-    const length = await getFileByteLength(path);
+    try {
+      await writeFile(path, data);
+    } catch (error) {
+      recordToolError('Android SAF', 'write', error);
+      throw error;
+    }
+    let length: unknown;
+    try {
+      length = await getFileByteLength(path);
+    } catch (error) {
+      recordToolError('Android SAF', 'verify-size', error);
+      // The write itself succeeded. Do not imply that it failed or retry
+      // automatically: the provider may have persisted the full document.
+      throw new Error('Android SAF write completed, but the saved size could not be verified. Check the file before retrying.');
+    }
     if (typeof length !== 'number' || !Number.isSafeInteger(length) || length !== data.byteLength) {
-      throw new Error(`Android SAF saved ${length} bytes; expected ${data.byteLength}`);
+      const message = `Android SAF saved ${length} bytes; expected ${data.byteLength}`;
+      recordToolError('Android SAF', 'verify-size', message);
+      throw new Error(message);
     }
     return;
   }
