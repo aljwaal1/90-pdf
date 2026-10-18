@@ -691,6 +691,18 @@ export async function executeStudioExport(
       targetExtension = 'zip';
       break;
     }
+    case 'vector-extractor': {
+      const { VectorExtractorProcessor } = await import('@/lib/pdf/processors/vector-extractor');
+      processor = new VectorExtractorProcessor();
+      targetExtension = 'svg';
+      break;
+    }
+    case 'pdf-to-slide': {
+      const { PDFToSlideProcessor } = await import('@/lib/pdf/processors/pdf-to-slide');
+      processor = new PDFToSlideProcessor();
+      targetExtension = 'pptx';
+      break;
+    }
     default:
       throw new Error(`Unsupported studio export tool: ${toolId}`);
   }
