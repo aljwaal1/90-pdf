@@ -39,19 +39,21 @@ export default function ToolsPageClient({ locale, localizedToolContent }: ToolsP
   };
 
   // Read initial values from URL search params (client-side)
-  const initialCategory = searchParams.get('category') || 'all';
+  const allowedCategories: CategoryFilter[] = ['all', 'favorites', 'edit-annotate', 'convert-to-pdf', 'convert-from-pdf', 'organize-manage', 'optimize-repair', 'secure-pdf'];
+  const rawCategory = searchParams.get('category') || 'all';
+  const initialCategory: CategoryFilter = allowedCategories.includes(rawCategory as CategoryFilter) ? rawCategory as CategoryFilter : 'all';
   const initialQuery = searchParams.get('q') || '';
 
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>(
-    (initialCategory as ToolCategory) || 'all'
+    initialCategory
   );
 
   // Sync state with URL params when they change
   useEffect(() => {
     const category = searchParams.get('category') || 'all';
     const query = searchParams.get('q') || '';
-    setSelectedCategory(category as CategoryFilter);
+    setSelectedCategory(allowedCategories.includes(category as CategoryFilter) ? category as CategoryFilter : 'all');
     setSearchQuery(query);
   }, [searchParams]);
   const [showFilters, setShowFilters] = useState(false);
@@ -78,7 +80,7 @@ export default function ToolsPageClient({ locale, localizedToolContent }: ToolsP
     }
 
     return tools;
-  }, [allTools, selectedCategory, searchQuery, favorites]);
+  }, [allTools, selectedCategory, searchQuery, favorites, localizedToolContent]);
 
   // Category options
   const categories: { value: CategoryFilter; label: string; icon?: React.ReactNode }[] = [
@@ -106,12 +108,12 @@ export default function ToolsPageClient({ locale, localizedToolContent }: ToolsP
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[hsl(var(--color-background))]">
+    <div className="min-h-screen flex flex-col overflow-x-clip bg-[hsl(var(--color-background))]">
       <Header locale={locale} />
 
       <main className="flex-1">
         {/* Page Header */}
-        <section className="relative pt-36 pb-20 overflow-hidden">
+        <section className="relative pt-28 pb-10 sm:pt-36 sm:pb-16 overflow-hidden">
           {/* Animated Background Blobs (Subtle) */}
           <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[hsl(var(--color-primary)/0.05)] rounded-full mix-blend-multiply filter blur-3xl opacity-50" />
@@ -120,10 +122,10 @@ export default function ToolsPageClient({ locale, localizedToolContent }: ToolsP
 
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl font-bold text-[hsl(var(--color-foreground))] mb-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[hsl(var(--color-foreground))] mb-4 sm:mb-6">
                 <span className="text-gradient">{t('toolsPage.title')}</span>
               </h1>
-              <p className="text-lg text-[hsl(var(--color-muted-foreground))] mb-10 leading-relaxed">
+              <p className="text-base sm:text-lg text-[hsl(var(--color-muted-foreground))] mb-6 sm:mb-10 leading-relaxed">
                 {t('toolsPage.subtitle', { count: allTools.length })}
               </p>
 
@@ -254,7 +256,7 @@ export default function ToolsPageClient({ locale, localizedToolContent }: ToolsP
               )
             ) : selectedCategory === 'favorites' ? (
               // Empty favorites state
-              <Card className="p-16 text-center glass-card border-dashed border-2">
+              <Card className="p-6 sm:p-16 text-center glass-card border-dashed border-2">
                 <div className="max-w-md mx-auto flex flex-col items-center">
                   <div className="w-20 h-20 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mb-6">
                     <Star className="h-10 w-10 text-amber-500" aria-hidden="true" />
