@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { X, ChevronRight, ChevronDown } from 'lucide-react';
+import { X, ChevronRight, ChevronDown, FileText, Workflow, Search } from 'lucide-react';
 import { type Locale } from '@/lib/i18n/config';
 import { type ToolCategory } from '@/types/tool';
 import { Button } from '@/components/ui/Button';
@@ -54,14 +54,16 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, locale 
 
   const mainNavItems = [
     { href: `/${locale}`, label: tCommon('navigation.home') },
+    { href: `/${locale}/studio`, label: locale === 'ar' ? 'استوديو PDF' : 'PDF Studio' },
     { href: `/${locale}/tools`, label: tCommon('navigation.tools'), hasSubmenu: true },
+    { href: `/${locale}/workflow`, label: locale === 'ar' ? 'سير العمل' : 'Workflow' },
     { href: `/${locale}/about`, label: tCommon('navigation.about') },
     { href: `/${locale}/faq`, label: tCommon('navigation.faq') },
     { href: `/${locale}/privacy`, label: tCommon('navigation.privacy') },
     { href: `/${locale}/contact`, label: tCommon('navigation.contact') },
   ];
 
-  // Focus trap and escape key handling
+  // Keep the original scroll lock when this drawer closes.
   useEffect(() => {
     if (isOpen) {
       // Store the currently focused element
@@ -71,19 +73,13 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, locale 
       closeButtonRef.current?.focus();
       
       // Prevent body scroll
+      const previousOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-      
-      // Restore focus to the previously focused element
-      if (previousActiveElement.current) {
-        previousActiveElement.current.focus();
-      }
+      return () => {
+        document.body.style.overflow = previousOverflow;
+        previousActiveElement.current?.focus();
+      };
     }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [isOpen]);
 
   // Handle keyboard navigation with focus trap
@@ -173,7 +169,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, locale 
         role="dialog"
         dir={locale === 'ar' ? 'rtl' : 'ltr'}
         aria-modal="true"
-        aria-label="Mobile navigation menu"
+        aria-label={locale === 'ar' ? 'قائمة التنقل' : 'Mobile navigation menu'}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -194,7 +190,15 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, locale 
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 flex-1 min-h-0 overflow-y-auto overscroll-contain" aria-label="Mobile navigation">
+        <nav className="p-4 flex-1 min-h-0 overflow-y-auto overscroll-contain pb-8" aria-label="Mobile navigation">
+          <div className="mb-4 grid grid-cols-2 gap-2">
+            <Link href={`/${locale}/studio`} onClick={handleLinkClick} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[hsl(var(--color-primary))] px-3 py-3 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2">
+              <FileText className="h-4 w-4" aria-hidden="true" />{locale === 'ar' ? 'فتح الاستوديو' : 'Open Studio'}
+            </Link>
+            <Link href={`/${locale}/tools`} onClick={handleLinkClick} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[hsl(var(--color-border))] bg-[hsl(var(--color-muted))] px-3 py-3 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2">
+              <Search className="h-4 w-4" aria-hidden="true" />{locale === 'ar' ? 'جميع الأدوات' : 'All tools'}
+            </Link>
+          </div>
           <ul className="flex flex-col gap-1">
             {mainNavItems.map((item) => (
               <li key={item.href}>
