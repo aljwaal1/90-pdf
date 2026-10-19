@@ -62,4 +62,35 @@ describe('pdf-lib integration smoke tests', () => {
     expect(output.getPage(0).getRotation().angle).toBe(90);
     expect((await output.save()).length).toBeGreaterThan(0);
   });
+
+  it('splits a document into independent single-page PDFs', async () => {
+    const input = await PDFDocument.create();
+    for (const width of [200, 220, 240]) input.addPage([width, 300]);
+
+    const results: Uint8Array[] = [];
+    for (const index of input.getPageIndices()) {
+      const part = await PDFDocument.create();
+      const [page] = await part.copyPages(input, [index]);
+      part.addPage(page);
+      results.push(await part.save());
+    }
+
+    expect(results).toHaveLength(3);
+    const reopened = await Promise.all(results.map((bytes) => PDFDocument.load(bytes)));
+    expect(reopened.every((document) => document.getPageCount() === 1)).toBe(true);
+    expect(reopened.map((document) => document.getPage(0).getWidth())).toEqual([200, 220, 240]);
+  });
+
+  it('deletes a requested page and keeps the remaining pages in order', async () => {
+    const input = await PDFDocument.create();
+    input.addPage([210, 300]);
+    input.addPage([220, 300]);
+    input.addPage([230, 300]);
+
+    input.removePage(1);
+    const reopened = await PDFDocument.load(await input.save());
+
+    expect(reopened.getPageCount()).toBe(2);
+    expect(reopened.getPages().map((page) => page.getWidth())).toEqual([210, 230]);
+  });
 });
