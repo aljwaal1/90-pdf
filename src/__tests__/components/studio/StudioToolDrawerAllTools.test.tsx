@@ -38,8 +38,8 @@ describe('StudioToolDrawer - Full Tool Parameters Alignment', () => {
     fireEvent.click(screen.getByText(/Every N Pages/i));
     expect(screen.getByText(/Pages Per Chunk/i)).toBeInTheDocument();
 
-    // Click submit
-    fireEvent.click(screen.getByRole('button', { name: /Apply Changes/i }));
+    // Split PDF opens its dedicated view rather than the in-place processor.
+    fireEvent.click(screen.getByRole('button', { name: /Open View/i }));
     await waitFor(() => {
       expect(onApplyMock).toHaveBeenCalledWith('split-pdf', expect.objectContaining({
         splitMode: 'everyN',
