@@ -141,11 +141,88 @@ export function clearStudioRecentTools(): void {
   } catch {}
 }
 
+// Processor-backed in-place tools; keep in sync with executeStudioOperation.
+export const STUDIO_IN_PLACE_TOOL_IDS = new Set([
+  "rotate-pdf",
+  "add-watermark",
+  "compress-pdf",
+  "page-numbers",
+  "add-blank-page",
+  "delete-pages",
+  "divide-pages",
+  "combine-single-page",
+  "grid-combine",
+  "overlay-pdf",
+  "pdf-booklet",
+  "photo-tiling-prepress",
+  "pdf-lossless-slicer",
+  "passport-id-composer",
+  "pdf-two-column-reflower",
+  "pdf-spine-bookbinder",
+  "pdf-page-resizer-uniform",
+  "pdf-scratchpad-canvas",
+  "bookmark",
+  "table-of-contents",
+  "interactive-toc-generator",
+  "bookmarks-auto-generator",
+  "batch-barcode-injector",
+  "signature-ink-optimizer",
+  "handwriting-ink-contrast-booster",
+  "background-color",
+  "text-color",
+  "edit-metadata",
+  "flatten-pdf",
+  "crop-pdf",
+  "reverse-pages",
+  "remove-blank-pages",
+  "header-footer",
+  "add-stamps",
+  "timestamp-pdf",
+  "add-page-labels",
+  "remove-annotations",
+  "pdf-to-greyscale",
+  "invert-colors",
+  "deskew-pdf",
+  "pdf-deskew-aligner",
+  "rasterize-pdf",
+  "linearize-pdf",
+  "sanitize-pdf",
+  "deep-sanitize",
+  "find-and-redact",
+  "redact-pdf",
+  "smart-data-redactor",
+  "remove-metadata",
+  "encrypt-pdf",
+  "remove-restrictions",
+  "decrypt-pdf",
+  "change-permissions",
+  "digital-sign-pdf",
+  "cert-cryptor",
+  "pdf-signature-anchor-helper",
+  "font-to-outline",
+  "ocg-manager",
+  "batch-watermark-remover",
+  "dead-link-debugger",
+  "repair-pdf",
+  "posterize-pdf",
+  "n-up-pdf",
+  "fix-page-size",
+  "page-dimensions",
+  "pdf-to-pdfa",
+  "eink-optimizer",
+  "extract-pages",
+  "merge-pdf",
+  "alternate-merge"
+]);
+
 export function getToolExecutionType(toolId: string): StudioToolExecutionType {
   const normId = normalizeStudioToolId(toolId);
   if (EXPORT_TOOL_IDS.has(normId)) return 'export';
   if (APPEND_TOOL_IDS.has(normId)) return 'append';
-  if (NAVIGATE_TOOL_IDS.has(normId)) return 'navigate';
+  if (NAVIGATE_TOOL_IDS.has(normId) || normId === 'split-pdf') return 'navigate';
+  // Do not route tools without an in-memory processor to the generic Studio runner.
+  // Such tools must use their dedicated pages rather than fail at execution time.
+  if (!STUDIO_IN_PLACE_TOOL_IDS.has(normId)) return 'navigate';
   return 'in-place';
 }
 
