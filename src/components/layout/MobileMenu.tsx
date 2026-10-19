@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { X, ChevronRight, ChevronDown, FileText, Workflow, Search } from 'lucide-react';
+import { X, ChevronRight, ChevronDown, FileText, Search } from 'lucide-react';
 import { type Locale } from '@/lib/i18n/config';
 import { type ToolCategory } from '@/types/tool';
 import { Button } from '@/components/ui/Button';
