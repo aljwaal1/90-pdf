@@ -93,8 +93,13 @@ jobs:
           CARGO_PROFILE_RELEASE_OPT_LEVEL: 'z'
           CARGO_INCREMENTAL: '0'
         run: npx tauri android build --apk --ci --target aarch64
-      - name: Sign release APK with temporary test key
+      - name: Sign and verify Android APK
         shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
           OUT="src-tauri/gen/android/app/build/outputs/apk"
@@ -103,23 +108,39 @@ jobs:
             UNSIGNED="$(find "$OUT" -type f -name '*release.apk' ! -path '*/signed/*' -print -quit)"
           fi
           test -n "$UNSIGNED" || { echo "Release APK not found"; find "$OUT" -type f -name '*.apk'; exit 1; }
-          mkdir -p /tmp/pdfcraft-signing
-          keytool -genkeypair -v -keystore /tmp/pdfcraft-signing/test.jks \
-            -alias pdfcraft-test -keyalg RSA -keysize 3072 -validity 3650 \
-            -storepass changeit -keypass changeit \
-            -dname "CN=90 PDF Temporary Test Build,O=PDFCraft,C=SE"
+          mkdir -p /tmp/pdfcraft-signing "$OUT/signed"
+          KEYSTORE=/tmp/pdfcraft-signing/release.jks
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            test -n "$ANDROID_KEYSTORE_PASSWORD" && test -n "$ANDROID_KEY_ALIAS" && test -n "$ANDROID_KEY_PASSWORD" || { echo "Incomplete Android signing secrets"; exit 1; }
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+            chmod 600 "$KEYSTORE"
+            echo "Using persistent release signing key from GitHub secrets."
+          else
+            KEYSTORE=/tmp/pdfcraft-signing/test.jks
+            ANDROID_KEYSTORE_PASSWORD=changeit
+            ANDROID_KEY_PASSWORD=changeit
+            ANDROID_KEY_ALIAS=pdfcraft-test
+            keytool -genkeypair -keystore "$KEYSTORE" -alias "$ANDROID_KEY_ALIAS" \
+              -keyalg RSA -keysize 3072 -validity 3650 \
+              -storepass "$ANDROID_KEYSTORE_PASSWORD" -keypass "$ANDROID_KEY_PASSWORD" \
+              -dname "CN=90 PDF Temporary Test Build,O=PDFCraft,C=SE"
+            echo "::warning::No persistent signing secrets configured. This APK cannot upgrade previous temporary-key builds."
+          fi
           ZIPALIGN="$ANDROID_HOME/build-tools/35.0.0/zipalign"
           APKSIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
           "$ZIPALIGN" -f -p 4 "$UNSIGNED" /tmp/pdfcraft-signing/aligned.apk
-          mkdir -p "$OUT/signed"
-          "$APKSIGNER" sign --ks /tmp/pdfcraft-signing/test.jks \
-            --ks-key-alias pdfcraft-test --ks-pass pass:changeit \
-            --key-pass pass:changeit \
-            --out "$OUT/signed/90-pdf-arm64-test-signed.apk" \
+          "$ZIPALIGN" -c -p 4 /tmp/pdfcraft-signing/aligned.apk
+          "$APKSIGNER" sign --ks "$KEYSTORE" \
+            --ks-key-alias "$ANDROID_KEY_ALIAS" \
+            --ks-pass env:ANDROID_KEYSTORE_PASSWORD \
+            --key-pass env:ANDROID_KEY_PASSWORD \
+            --out "$OUT/signed/90-pdf-arm64-signed.apk" \
             /tmp/pdfcraft-signing/aligned.apk
-          "$APKSIGNER" verify --verbose --print-certs "$OUT/signed/90-pdf-arm64-test-signed.apk"
+          "$APKSIGNER" verify --verbose --print-certs "$OUT/signed/90-pdf-arm64-signed.apk"
+          unzip -t "$OUT/signed/90-pdf-arm64-signed.apk" >/dev/null
+          test "$(stat -c %s "$OUT/signed/90-pdf-arm64-signed.apk")" -gt 1000000
           rm -f "$UNSIGNED"
-          echo "Temporary signing key is discarded after this run. Later builds cannot update this installation without uninstalling it."
+          echo "APK integrity, alignment, and signature verified."
       - name: Report APK size
         if: success()
         run: find src-tauri/gen/android/app/build/outputs/apk -name '*.apk' -type f -printf '%p %s bytes\n'
