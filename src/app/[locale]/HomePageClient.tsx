@@ -83,13 +83,13 @@ export default function HomePageClient({ locale, localizedToolContent }: HomePag
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[hsl(var(--color-background))]">
+    <div className="min-h-screen flex flex-col overflow-x-clip bg-[hsl(var(--color-background))]">
       <Header locale={locale} />
 
       <main id="main-content" className="flex-1 relative" tabIndex={-1}>
         {/* Hero Section */}
         <section
-          className="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-28"
+          className="relative overflow-hidden pt-24 pb-12 sm:pt-28 sm:pb-20 lg:pt-32 lg:pb-28"
           aria-labelledby="hero-title"
         >
           {/* Animated Background Blobs */}
@@ -110,13 +110,13 @@ export default function HomePageClient({ locale, localizedToolContent }: HomePag
               </div>
 
               {/* Hero Title */}
-              <h1 id="hero-title" className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <h1 id="hero-title" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-5 sm:mb-6">
                 <span className="text-[hsl(var(--color-foreground))]">{t('home.hero.title')} </span>
                 <span className="text-gradient block mt-1 pb-2">{t('home.hero.highlight')}</span>
               </h1>
 
               {/* Hero Subtitle */}
-              <p className="text-lg text-[hsl(var(--color-muted-foreground))] mb-8 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-base sm:text-lg text-[hsl(var(--color-muted-foreground))] mb-7 max-w-2xl mx-auto leading-relaxed">
                 {t('home.hero.subtitle')}
               </p>
 
@@ -277,7 +277,7 @@ export default function HomePageClient({ locale, localizedToolContent }: HomePag
         {/* Stats Section */}
         <section className="py-16" aria-label="Statistics">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-[hsl(var(--color-border))]">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-8 text-center">
               <div className="p-4">
                 <div className="text-3xl lg:text-4xl font-bold text-gradient mb-1">
                   {allTools.length}+
