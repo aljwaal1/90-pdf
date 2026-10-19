@@ -639,12 +639,14 @@ export async function executeStudioOperation(
     if (output.result.length !== 1 || !(output.result[0] instanceof Blob)) {
       throw new Error('This operation produced multiple files. Use the dedicated export tool to save every result.');
     }
+    if (output.result[0].size === 0) throw new Error('The PDF processor returned an empty file.');
     return output.result[0];
   }
 
   if (!(output.result instanceof Blob)) {
     throw new Error('The operation did not produce a valid PDF document.');
   }
+  if (output.result.size === 0) throw new Error('The PDF processor returned an empty file.');
   return output.result;
 }
 
@@ -793,6 +795,10 @@ export async function executeStudioExport(
     throw new Error(output.error?.message || 'Export failed');
   }
 
+  if (Array.isArray(output.result) && output.result.length === 0) {
+    throw new Error('The export processor returned no files.');
+  }
+
   // Multiple processor outputs must never be silently reduced to the first file.
   // Package them as ZIP so the existing save dialog can preserve every result.
   if (Array.isArray(output.result) && output.result.length > 1) {
@@ -800,8 +806,8 @@ export async function executeStudioExport(
     const archive = new JSZip();
     for (let index = 0; index < output.result.length; index++) {
       const item = output.result[index];
-      if (!(item instanceof Blob)) {
-        throw new Error(`Unsupported multi-file output at index ${index}`);
+      if (!(item instanceof Blob) || item.size === 0) {
+        throw new Error(`Invalid or empty multi-file output at index ${index}`);
       }
       const name = item instanceof File && item.name
         ? item.name
@@ -822,7 +828,11 @@ export async function executeStudioExport(
   } else if (typeof output.result === 'string') {
     finalBlob = new Blob([output.result], { type: 'text/plain;charset=utf-8' });
   } else {
-    finalBlob = new Blob([output.result]);
+    throw new Error('The export processor returned an unsupported result type.');
+  }
+
+  if (finalBlob.size === 0) {
+    throw new Error('The export processor returned an empty file.');
   }
 
   return {
