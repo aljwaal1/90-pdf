@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { locales, defaultLocale } from '@/lib/i18n/config';
+import { locales, defaultLocale, type Locale } from '@/lib/i18n/config';
 
 // Keep a useful page visible while client-side locale routing initializes.
 // Users can navigate manually if the router is delayed or JavaScript hydration fails.
@@ -10,11 +10,11 @@ export default function RootPage() {
   const router = useRouter();
 
   useEffect(() => {
-    let destination = defaultLocale;
+    let destination: Locale = defaultLocale;
     try {
       const primaryLang = navigator.language.split('-')[0]?.toLowerCase();
       if (primaryLang && (locales as readonly string[]).includes(primaryLang)) {
-        destination = primaryLang as typeof defaultLocale;
+        destination = primaryLang as Locale;
       }
     } catch {
       // Continue with the supported default locale.
