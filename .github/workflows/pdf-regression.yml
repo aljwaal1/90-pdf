@@ -32,3 +32,8 @@ jobs:
         run: npm test
       - name: Build production web assets
         run: npm run build
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Test native file path guards
+        working-directory: src-tauri
+        run: cargo test --lib
