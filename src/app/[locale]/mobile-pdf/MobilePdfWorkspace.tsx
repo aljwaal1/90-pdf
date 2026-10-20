@@ -97,16 +97,19 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
   const [rotation, setRotation] = useState<90 | 180 | 270>(90);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('');
+  const [error, setError] = useState(false);
 
   async function run() {
     setBusy(true);
     setStatus('');
+    setError(false);
     try {
       const bytes = await processPdf(files, op, pages, rotation);
       const name = '90-pdf-' + op + '-' + Date.now() + '.pdf';
       const destination = await savePdf(bytes, name);
       setStatus((ar ? 'تم حفظ الملف: ' : 'Saved PDF: ') + destination);
     } catch (error) {
+      setError(true);
       setStatus((ar ? 'تعذر إتمام العملية: ' : 'Operation failed: ') + (error instanceof Error ? error.message : String(error)));
     } finally {
       setBusy(false);
@@ -129,14 +132,15 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
         {operations.map((item) => (
           <button key={item.id} type="button" aria-pressed={op === item.id}
             className={`rounded-xl border px-3 py-3 ${op === item.id ? 'border-blue-600 bg-blue-100 text-slate-900' : ''}`}
-            onClick={() => { setOp(item.id); setFiles([]); setStatus(''); }}>
+            disabled={busy}
+            onClick={() => { setOp(item.id); setFiles([]); setStatus(''); setError(false); }}>
             {ar ? item.ar : item.en}
           </button>
         ))}
       </div>
       <label className="block space-y-2">
         <span className="font-semibold">{ar ? 'اختر ملفات PDF' : 'Choose PDF files'}</span>
-        <input className="block w-full rounded-lg border p-3" type="file" accept=".pdf,application/pdf"
+        <input key={op} disabled={busy} className="block w-full rounded-lg border p-3" type="file" accept=".pdf,application/pdf"
           multiple={op === 'merge'}
           onChange={(event: ChangeEvent<HTMLInputElement>) => {
             const selection = Array.from(event.target.files ?? []);
@@ -164,7 +168,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
         className="w-full rounded-xl bg-blue-700 p-4 font-bold text-white disabled:opacity-50">
         {busy ? (ar ? 'جارٍ المعالجة…' : 'Processing…') : (ar ? 'معالجة وحفظ PDF' : 'Process and save PDF')}
       </button>
-      <p role="status" aria-live="polite" className="break-words">{status}</p>
+      <p role={error ? "alert" : "status"} aria-live="polite" className={`break-words ${error ? "text-red-600" : "text-green-700"}`}>{status}</p>
     </main>
   );
 }
