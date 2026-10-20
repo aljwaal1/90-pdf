@@ -1,4 +1,4 @@
-import { PDFDocument } from 'pdf-lib';
+import { degrees, PDFDocument } from 'pdf-lib';
 import { readAndroidDocument, writeAndroidDocument, isAndroidDocumentUri } from './android-document-io';
 
 /**
@@ -52,4 +52,54 @@ export async function extractAndroidPdfPages(
   pages.forEach((page) => output.addPage(page));
   await writeAndroidDocument(destinationUri, await output.save());
   return output.getPageCount();
+}
+
+/** Remove selected zero-based pages and save the remainder to a distinct document. */
+export async function deleteAndroidPdfPages(
+  sourceUri: string,
+  destinationUri: string,
+  pageIndices: readonly number[],
+): Promise<number> {
+  if (!isAndroidDocumentUri(sourceUri) || !isAndroidDocumentUri(destinationUri)) {
+    throw new Error('Android content:// source and destination URIs are required');
+  }
+  if (sourceUri === destinationUri) throw new Error('Destination must differ from source');
+  if (!pageIndices.length) throw new Error('Select at least one page');
+  const source = await PDFDocument.load(await readAndroidDocument(sourceUri));
+  const selected = new Set(pageIndices);
+  if (pageIndices.some((index) => !Number.isInteger(index) || index < 0 || index >= source.getPageCount())) {
+    throw new Error('Selected page index is outside the document');
+  }
+  if (selected.size >= source.getPageCount()) throw new Error('Cannot delete every page');
+
+  for (let i = source.getPageCount() - 1; i >= 0; i--) {
+    if (selected.has(i)) source.removePage(i);
+  }
+  await writeAndroidDocument(destinationUri, await source.save());
+  return source.getPageCount();
+}
+
+/** Rotate selected zero-based pages by quarter turns while preserving the original document. */
+export async function rotateAndroidPdfPages(
+  sourceUri: string,
+  destinationUri: string,
+  pageIndices: readonly number[],
+  clockwiseDegrees: 90 | 180 | 270,
+): Promise<number> {
+  if (!isAndroidDocumentUri(sourceUri) || !isAndroidDocumentUri(destinationUri)) {
+    throw new Error('Android content:// source and destination URIs are required');
+  }
+  if (sourceUri === destinationUri) throw new Error('Destination must differ from source');
+  if (!pageIndices.length) throw new Error('Select at least one page');
+  if (![90, 180, 270].includes(clockwiseDegrees)) throw new Error('Unsupported rotation');
+  const source = await PDFDocument.load(await readAndroidDocument(sourceUri));
+  if (pageIndices.some((index) => !Number.isInteger(index) || index < 0 || index >= source.getPageCount())) {
+    throw new Error('Selected page index is outside the document');
+  }
+  for (const index of new Set(pageIndices)) {
+    const page = source.getPage(index);
+    page.setRotation(degrees((page.getRotation().angle + clockwiseDegrees) % 360));
+  }
+  await writeAndroidDocument(destinationUri, await source.save());
+  return source.getPageCount();
 }
