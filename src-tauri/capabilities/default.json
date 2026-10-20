@@ -9,6 +9,11 @@
     "core:default",
     "dialog:default",
     "fs:default",
-    "android-fs:default"
+    "android-fs:default",
+    "android-fs:allow-create-new-public-file",
+    "android-fs:allow-write-file",
+    "android-fs:allow-set-public-file-pending",
+    "android-fs:allow-scan-public-file",
+    "android-fs:allow-remove-file"
   ]
 }
