@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PDFDocument } from 'pdf-lib';
-import { extractAndroidPdfPages, mergeAndroidPdfDocuments } from '@/lib/android-pdf-operations';
+import { deleteAndroidPdfPages, rotateAndroidPdfPages, extractAndroidPdfPages, mergeAndroidPdfDocuments } from '@/lib/android-pdf-operations';
 
 const { readFile, writeFile, files } = vi.hoisted(() => ({
   readFile: vi.fn(),
@@ -58,5 +58,33 @@ describe('Android PDF operations through SAF URIs', () => {
     await expect(mergeAndroidPdfDocuments([uri, uri], uri)).rejects.toThrow('Destination');
     await expect(extractAndroidPdfPages(uri, 'content://pdf/out', [1])).rejects.toThrow('outside');
     expect(writeFile).not.toHaveBeenCalled();
+  });
+
+  it('deletes chosen pages without changing source bytes', async () => {
+    const source = 'content://pdf/deletion-source';
+    const output = 'content://pdf/deletion-output';
+    const original = await samplePdf([210, 220, 230]);
+    files.set(source, original);
+    expect(await deleteAndroidPdfPages(source, output, [1])).toBe(2);
+    const pdf = await PDFDocument.load(files.get(output)!);
+    expect(pdf.getPages().map((p) => p.getWidth())).toEqual([210, 230]);
+    expect(files.get(source)).toBe(original);
+  });
+
+  it('prevents deleting all pages', async () => {
+    const source = 'content://pdf/one';
+    files.set(source, await samplePdf([210]));
+    await expect(deleteAndroidPdfPages(source, 'content://pdf/empty', [0])).rejects.toThrow('every page');
+    expect(files.has('content://pdf/empty')).toBe(false);
+  });
+
+  it('rotates selected pages and preserves unrelated pages', async () => {
+    const source = 'content://pdf/rotation-source';
+    const output = 'content://pdf/rotation-output';
+    files.set(source, await samplePdf([210, 220]));
+    expect(await rotateAndroidPdfPages(source, output, [1], 90)).toBe(2);
+    const pdf = await PDFDocument.load(files.get(output)!);
+    expect(pdf.getPage(0).getRotation().angle).toBe(0);
+    expect(pdf.getPage(1).getRotation().angle).toBe(90);
   });
 });
