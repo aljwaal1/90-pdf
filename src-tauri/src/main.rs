@@ -70,14 +70,31 @@ async fn save_file(app: tauri::AppHandle, suggested_name: String, filters: Vec<F
     }
 }
 
+// Android document providers return content:// URIs, not native filesystem paths.
+// Avoid treating those URIs as writable local paths. The Android FS plugin
+// must handle their reads and writes through its URI-aware API.
+fn require_local_path(path: &str) -> Result<&str, String> {
+    let lower = path.to_ascii_lowercase();
+    if lower.starts_with("content://") {
+        return Err("Android document URI: use the Android FS plugin URI-aware read/write API instead of native filesystem commands".to_string());
+    }
+    if lower.starts_with("file://") {
+        return Err("File URI is not a native path; use the filesystem plugin to resolve it".to_string());
+    }
+    if path.is_empty() {
+        return Err("File path is empty".to_string());
+    }
+    Ok(path)
+}
+
 #[tauri::command]
 fn read_file(path: String) -> Result<Vec<u8>, String> {
-    fs::read(&path).map_err(|e| e.to_string())
+    fs::read(require_local_path(&path)?).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 fn write_file(path: String, data: Vec<u8>) -> Result<(), String> {
-    fs::write(&path, data).map_err(|e| e.to_string())
+    fs::write(require_local_path(&path)?, data).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -365,4 +382,26 @@ fn main() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(test)]
+mod storage_uri_tests {
+    use super::require_local_path;
+
+    #[test]
+    fn rejects_android_document_uris_as_filesystem_paths() {
+        assert!(require_local_path("content://com.android.providers.downloads.documents/document/42").is_err());
+        assert!(require_local_path("CONTENT://provider/document").is_err());
+    }
+
+    #[test]
+    fn rejects_file_urls_and_empty_paths() {
+        assert!(require_local_path("file:///storage/emulated/0/test.pdf").is_err());
+        assert!(require_local_path("").is_err());
+    }
+
+    #[test]
+    fn permits_native_filesystem_paths() {
+        assert_eq!(require_local_path("/tmp/test.pdf").unwrap(), "/tmp/test.pdf");
+    }
 }
