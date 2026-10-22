@@ -71,7 +71,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
 }) => {
   const router = useRouter();
   const validLocale: Locale = locale === 'ar' ? 'ar' : 'en';
-  const isZh = validLocale === 'ar';
+  const isArabic = validLocale === 'ar';
 
   // Multi-document states
   const [documents, setDocuments] = useState<StudioDocument[]>(() => {
@@ -187,7 +187,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       );
 
       if (validPdfs.length === 0) {
-        notify('error', isZh ? 'يرجى اختيار ملف PDF صالح' : 'Please select a valid PDF file');
+        notify('error', isArabic ? 'يرجى اختيار ملف PDF صالح' : 'Please select a valid PDF file');
         return;
       }
 
@@ -205,12 +205,12 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       setActiveToolId(null);
       notify(
         'success',
-        isZh
+        isArabic
           ? `تم تحميل ${newDocs.length} مستند PDF بنجاح`
           : `Successfully loaded ${newDocs.length} PDF document(s)`
       );
     },
-    [notify, isZh]
+    [notify, isArabic]
   );
 
   const handleLoadFile = useCallback(
@@ -233,7 +233,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         if (targetDoc && targetDoc.historyStack.length > 0) {
           if (
             !window.confirm(
-              isZh
+              isArabic
                 ? `المستند «${targetDoc.name}» يحتوي على تعديلات غير محفوظة. هل تريد إغلاقه؟`
                 : `Document "${targetDoc.name}" contains unsaved changes. Are you sure you want to close it?`
             )
@@ -301,20 +301,20 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         addStudioRecentTool(toolId);
         notify(
           'success',
-          isZh
+          isArabic
             ? `تم تطبيق «${toolName}» بنجاح. يمكنك اختيار أداة أخرى.`
             : `Applied "${toolName}" in-place. Select another action on the left`
         );
       } catch (err: any) {
         notify(
           'error',
-          err?.message || (isZh ? 'فشل تطبيق العملية. تحقق من الخيارات' : 'Failed to apply operation. Please check options')
+          err?.message || (isArabic ? 'فشل تطبيق العملية. تحقق من الخيارات' : 'Failed to apply operation. Please check options')
         );
       } finally {
         setIsApplying(false);
       }
     },
-    [currentBlob, file, activeDoc, notify, validLocale, isZh]
+    [currentBlob, file, activeDoc, notify, validLocale, isArabic]
   );
 
   // Handle export/convert operation without altering central PDF viewer
@@ -330,7 +330,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
 
         const saved = await saveBlobFile(blob, filename);
         if (!saved) {
-          notify('error', isZh
+          notify('error', isArabic
             ? `تم إنشاء «${filename}» ولكن لم يُحفظ. يمكنك إعادة المحاولة من لوحة النتائج.`
             : `Created "${filename}" but not saved. Retry from the results panel.`);
           return;
@@ -338,16 +338,16 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         setPendingExport(null);
         setActiveToolId(null);
         addStudioRecentTool(toolId);
-        notify('success', isZh
+        notify('success', isArabic
           ? `تم حفظ «${filename}» في الموقع الذي اخترته.`
           : `Saved "${filename}" in your selected location.`);
       } catch (err: any) {
-        notify('error', err?.message || (isZh ? 'فشل تحويل الملف وتصديره' : 'Export conversion failed'));
+        notify('error', err?.message || (isArabic ? 'فشل تحويل الملف وتصديره' : 'Export conversion failed'));
       } finally {
         setIsApplying(false);
       }
     },
-    [currentBlob, file, notify, isZh]
+    [currentBlob, file, notify, isArabic]
   );
 
   // Undo last operation on active document
@@ -373,8 +373,8 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         return doc;
       })
     );
-    notify('success', isZh ? `تم التراجع عن«${previousItem.action}»` : `Undone "${previousItem.action}"`);
-  }, [activeDoc, notify, isZh]);
+    notify('success', isArabic ? `تم التراجع عن«${previousItem.action}»` : `Undone "${previousItem.action}"`);
+  }, [activeDoc, notify, isArabic]);
 
   // Redo operation on active document
   const handleRedo = useCallback(() => {
@@ -399,15 +399,15 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         return doc;
       })
     );
-    notify('success', isZh ? `تمت إعادة«${nextItem.action}»` : `Redone "${nextItem.action}"`);
-  }, [activeDoc, notify, isZh]);
+    notify('success', isArabic ? `تمت إعادة«${nextItem.action}»` : `Redone "${nextItem.action}"`);
+  }, [activeDoc, notify, isArabic]);
 
   // Revert all changes on active document back to initial version
   const handleRevert = useCallback(() => {
     if (!activeDoc || activeDoc.historyStack.length === 0) return;
     if (
       window.confirm(
-        isZh
+        isArabic
           ? `هل تريد تجاهل جميع تعديلات «${activeDoc.name}» واستعادة النسخة الأصلية؟`
           : `Discard all changes to "${activeDoc.name}" and revert to the original version?`
       )
@@ -429,10 +429,10 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       setIsHistoryOpen(false);
       notify(
         'success',
-        isZh ? `تمت استعادة«${activeDoc.name}»إلى نسخته الأصلية` : `Reverted "${activeDoc.name}" to original version`
+        isArabic ? `تمت استعادة«${activeDoc.name}»إلى نسخته الأصلية` : `Reverted "${activeDoc.name}" to original version`
       );
     }
-  }, [activeDoc, notify, isZh]);
+  }, [activeDoc, notify, isArabic]);
 
   // Batch Export all opened documents as a single ZIP archive
   const handleExportAllZip = useCallback(async () => {
@@ -451,23 +451,23 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       setPendingExport({ blob: zipBlob, filename: zipName });
       const saved = await saveBlobFile(zipBlob, zipName);
       if (!saved) {
-        notify('error', isZh ? 'تم تجهيز ZIP ولم يُحفظ. أعد المحاولة من لوحة النتائج.' : 'ZIP created but not saved. Retry from results.');
+        notify('error', isArabic ? 'تم تجهيز ZIP ولم يُحفظ. أعد المحاولة من لوحة النتائج.' : 'ZIP created but not saved. Retry from results.');
         return;
       }
       setPendingExport(null);
       notify(
         'success',
-        isZh
+        isArabic
           ? `تم حفظ الملف المضغوط الذي يحتوي على ${documents.length} مستندات`
           : `Packaged and exported all ${documents.length} documents`
       );
     } catch (err: any) {
-      notify('error', err?.message || (isZh ? 'فشل تصدير الملفات المضغوطة' : 'Failed to package export'));
+      notify('error', err?.message || (isArabic ? 'فشل تصدير الملفات المضغوطة' : 'Failed to package export'));
     } finally {
       setIsApplying(false);
       setIsExportMenuOpen(false);
     }
-  }, [documents, notify, isZh]);
+  }, [documents, notify, isArabic]);
 
   // Export / Save final document
   const handleExport = useCallback(async () => {
@@ -482,16 +482,16 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         setPendingExport(null);
         notify(
           'success',
-          isZh ? `تم حفظ المستند وتصديره«${fileName}»` : `Document saved and exported as "${fileName}"`
+          isArabic ? `تم حفظ المستند وتصديره«${fileName}»` : `Document saved and exported as "${fileName}"`
         );
       } else {
-        notify('error', isZh ? 'لم يُحفظ المستند. يمكنك إعادة المحاولة من لوحة النتائج.' : 'Document not saved. Retry from the results panel.');
+        notify('error', isArabic ? 'لم يُحفظ المستند. يمكنك إعادة المحاولة من لوحة النتائج.' : 'Document not saved. Retry from the results panel.');
       }
     } catch (err: any) {
       setDebugEntries(prev => [...prev.slice(-199), `[${new Date().toISOString()}] SAVE ERROR: ${String(err?.stack || err?.message || err)}`]);
-      notify('error', err?.message || (isZh ? 'فشل حفظ المستند وتصديره' : 'Failed to save and export document'));
+      notify('error', err?.message || (isArabic ? 'فشل حفظ المستند وتصديره' : 'Failed to save and export document'));
     }
-  }, [currentBlob, file, notify, isZh]);
+  }, [currentBlob, file, notify, isArabic]);
 
   // Print current in-memory document
   const handlePrint = useCallback(async () => {
@@ -502,7 +502,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         const printers = await getSystemPrinters();
         if (printers.length > 0) {
           await printPdfFile(currentBlob, printers[0].name);
-          notify('success', isZh ? 'أُرسلت مهمة الطباعة' : 'Print job sent');
+          notify('success', isArabic ? 'أُرسلت مهمة الطباعة' : 'Print job sent');
           return;
         }
       }
@@ -514,9 +514,9 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
         window.print();
       }
     } catch (err: any) {
-      notify('error', err?.message || (isZh ? 'فشل بدء الطباعة' : 'Failed to trigger print'));
+      notify('error', err?.message || (isArabic ? 'فشل بدء الطباعة' : 'Failed to trigger print'));
     }
-  }, [currentBlob, notify, isZh]);
+  }, [currentBlob, notify, isArabic]);
 
   // Keyboard shortcuts (Ctrl+Z, Ctrl+Y, Ctrl+S, Ctrl+P, Escape, /)
   useEffect(() => {
@@ -568,7 +568,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
           <Link
             href={`/${locale}`}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0"
-            title={isZh ? 'العودة للرئيسية' : 'Home'}
+            title={isArabic ? 'العودة للرئيسية' : 'Home'}
           >
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[hsl(var(--color-primary))] to-[hsl(var(--color-accent))] shadow-sm">
               <Sparkles className="h-4 w-4 text-white" />
@@ -591,10 +591,10 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                       ? 'bg-[hsl(var(--color-primary)/0.15)] text-[hsl(var(--color-primary))] hover:bg-[hsl(var(--color-primary)/0.25)]'
                       : 'bg-[hsl(var(--color-muted))] text-[hsl(var(--color-muted-foreground))]'
                   }`}
-                  title={isZh ? 'عرض سجل العمليات' : 'View Action History'}
+                  title={isArabic ? 'عرض سجل العمليات' : 'View Action History'}
                 >
                   <History className="w-2.5 h-2.5" />
-                  <span>+{historyStack.length} {isZh ? 'عمليات' : 'action(s)'}</span>
+                  <span>+{historyStack.length} {isArabic ? 'عمليات' : 'action(s)'}</span>
                 </button>
               </div>
             </>
@@ -608,7 +608,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
               onClick={handleUndo}
               disabled={historyStack.length === 0}
               className="p-1.5 rounded-lg text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-background))] disabled:opacity-30 disabled:hover:bg-transparent transition-all"
-              title={isZh ? 'تراجع (Ctrl+Z)' : 'Undo (Ctrl+Z)'}
+              title={isArabic ? 'تراجع (Ctrl+Z)' : 'Undo (Ctrl+Z)'}
               aria-label="Undo"
             >
               <Undo2 className="w-4 h-4" />
@@ -617,7 +617,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
               onClick={handleRedo}
               disabled={redoStack.length === 0}
               className="p-1.5 rounded-lg text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-background))] disabled:opacity-30 disabled:hover:bg-transparent transition-all"
-              title={isZh ? 'إعادة (Ctrl+Y)' : 'Redo (Ctrl+Y)'}
+              title={isArabic ? 'إعادة (Ctrl+Y)' : 'Redo (Ctrl+Y)'}
               aria-label="Redo"
             >
               <Redo2 className="w-4 h-4" />
@@ -628,17 +628,17 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                 <button
                   onClick={handleRevert}
                   className="px-2 py-1 text-[11px] font-medium text-[hsl(var(--color-muted-foreground))] hover:text-red-500 rounded-lg hover:bg-[hsl(var(--color-background))] transition-all flex items-center gap-1"
-                  title={isZh ? 'استعادة النسخة الأصلية' : 'Revert to Initial Version'}
+                  title={isArabic ? 'استعادة النسخة الأصلية' : 'Revert to Initial Version'}
                 >
                   <RotateCcw className="w-3 h-3" />
-                  <span className="hidden md:inline">{isZh ? 'استعادة الأصل' : 'Revert'}</span>
+                  <span className="hidden md:inline">{isArabic ? 'استعادة الأصل' : 'Revert'}</span>
                 </button>
               </>
             )}
           </div>
         )}
 
-        <button type="button" onClick={() => setDebugOpen(true)} aria-label="Open debug log" className="shrink-0 rounded-lg border border-[hsl(var(--color-border))] px-2 py-1.5 text-xs font-semibold">{isZh ? 'سجل الأخطاء' : 'Debug Log'} ({debugEntries.length})</button>
+        <button type="button" onClick={() => setDebugOpen(true)} aria-label="Open debug log" className="shrink-0 rounded-lg border border-[hsl(var(--color-border))] px-2 py-1.5 text-xs font-semibold">{isArabic ? 'سجل الأخطاء' : 'Debug Log'} ({debugEntries.length})</button>
 
         {/* Right: Actions & Mode Switch */}
         <div className="flex items-center gap-2 shrink-0">
@@ -648,11 +648,11 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handlePrint}
-                title={isZh ? 'طباعة المستند (Ctrl+P)' : 'Print Document (Ctrl+P)'}
+                title={isArabic ? 'طباعة المستند (Ctrl+P)' : 'Print Document (Ctrl+P)'}
                 className="h-8 px-2.5 text-xs gap-1.5"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{isZh ? 'طباعة' : 'Print'}</span>
+                <span className="hidden sm:inline">{isArabic ? 'طباعة' : 'Print'}</span>
               </Button>
 
               {/* Split Export Button */}
@@ -661,17 +661,17 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                   variant="primary"
                   size="sm"
                   onClick={handleExport}
-                  title={isZh ? 'حفظ وتصدير PDF النهائي (Ctrl+S)' : 'Save & Export Final PDF (Ctrl+S)'}
+                  title={isArabic ? 'حفظ وتصدير PDF النهائي (Ctrl+S)' : 'Save & Export Final PDF (Ctrl+S)'}
                   className="h-8 px-3 text-xs gap-1.5 rounded-r-none border-r border-white/20"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>{isZh ? 'حفظ وتصدير' : 'Save & Export'}</span>
+                  <span>{isArabic ? 'حفظ وتصدير' : 'Save & Export'}</span>
                 </Button>
                 <button
                   type="button"
                   onClick={() => setIsExportMenuOpen((prev) => !prev)}
                   className="h-8 px-1.5 rounded-r-lg bg-[hsl(var(--color-primary))] text-white hover:bg-[hsl(var(--color-primary-hover))] transition-colors flex items-center justify-center border-l border-white/20"
-                  title={isZh ? 'المزيد من صيغ التصدير' : 'More Export Formats'}
+                  title={isArabic ? 'المزيد من صيغ التصدير' : 'More Export Formats'}
                   aria-label="More export formats"
                 >
                   <ChevronDown className="w-3.5 h-3.5" />
@@ -688,7 +688,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                       className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs text-left rounded-lg hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] font-medium transition-colors"
                     >
                       <Download className="w-3.5 h-3.5 text-[hsl(var(--color-primary))]" />
-                      <span>{isZh ? 'حفظ PDF المعدّل (Ctrl+S)' : 'Save Edited PDF (Ctrl+S)'}</span>
+                      <span>{isArabic ? 'حفظ PDF المعدّل (Ctrl+S)' : 'Save Edited PDF (Ctrl+S)'}</span>
                     </button>
                     <button
                       onClick={() => {
@@ -698,7 +698,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                       className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs text-left rounded-lg hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] font-medium transition-colors"
                     >
                       <FileType className="w-3.5 h-3.5 text-blue-500" />
-                      <span>{isZh ? 'تصدير إلى Word (.docx)' : 'Export as Word (.docx)'}</span>
+                      <span>{isArabic ? 'تصدير إلى Word (.docx)' : 'Export as Word (.docx)'}</span>
                     </button>
                     <button
                       onClick={() => {
@@ -708,7 +708,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                       className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs text-left rounded-lg hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] font-medium transition-colors"
                     >
                       <ImageIcon className="w-3.5 h-3.5 text-amber-500" />
-                      <span>{isZh ? 'تصدير الصور (.zip)' : 'Export as Images (.zip)'}</span>
+                      <span>{isArabic ? 'تصدير الصور (.zip)' : 'Export as Images (.zip)'}</span>
                     </button>
                     {documents.length > 1 && (
                       <>
@@ -719,7 +719,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>
-                            {isZh
+                            {isArabic
                               ? `تصدير جميع المستندات (${documents.length} ملفات .zip)`
                               : `Export All Documents (${documents.length} files .zip)`}
                           </span>
@@ -735,7 +735,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                       className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs text-left rounded-lg hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] font-medium transition-colors"
                     >
                       <Printer className="w-3.5 h-3.5 text-zinc-400" />
-                      <span>{isZh ? 'طباعة (Ctrl+P)' : 'Native Print (Ctrl+P)'}</span>
+                      <span>{isArabic ? 'طباعة (Ctrl+P)' : 'Native Print (Ctrl+P)'}</span>
                     </button>
                   </div>
                 )}
@@ -748,7 +748,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                   }
                 }}
                 className="p-1.5 rounded-lg text-[hsl(var(--color-muted-foreground))] hover:text-red-500 hover:bg-[hsl(var(--color-muted))] transition-colors ml-1"
-                title={isZh ? 'إغلاق المستند' : 'Close document'}
+                title={isArabic ? 'إغلاق المستند' : 'Close document'}
                 aria-label="Close file"
               >
                 <X className="w-4 h-4" />
@@ -758,10 +758,10 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
             <Link
               href={`/${locale}`}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[hsl(var(--color-border))] text-xs font-medium text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-muted))] transition-all"
-              title={isZh ? 'التبديل إلى عرض الأدوات' : 'Classic Tool Grid View'}
+              title={isArabic ? 'التبديل إلى عرض الأدوات' : 'Classic Tool Grid View'}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
-              <span>{isZh ? 'عرض الأدوات' : 'Classic Grid View'}</span>
+              <span>{isArabic ? 'عرض الأدوات' : 'Classic Grid View'}</span>
             </Link>
           )}
         </div>
@@ -772,7 +772,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-[hsl(var(--color-border))]">
               <div className="flex items-center gap-1.5 text-xs font-bold text-[hsl(var(--color-foreground))]">
                 <History className="w-3.5 h-3.5 text-[hsl(var(--color-primary))]" />
-                <span>{isZh ? 'سجل العمليات' : 'Operation Timeline'}</span>
+                <span>{isArabic ? 'سجل العمليات' : 'Operation Timeline'}</span>
               </div>
               <button
                 onClick={() => setIsHistoryOpen(false)}
@@ -785,14 +785,14 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
               <div className="flex items-center justify-between p-2 rounded-xl text-xs bg-[hsl(var(--color-muted)/0.3)]">
                 <div className="flex items-center gap-2 truncate">
                   <FileText className="w-3.5 h-3.5 text-[hsl(var(--color-muted-foreground))] shrink-0" />
-                  <span className="truncate font-medium">{file.name} ({isZh ? 'الأصل' : 'Original'})</span>
+                  <span className="truncate font-medium">{file.name} ({isArabic ? 'الأصل' : 'Original'})</span>
                 </div>
                 {historyStack.length > 0 && (
                   <button
                     onClick={handleRevert}
                     className="text-[10px] text-[hsl(var(--color-primary))] font-semibold hover:underline"
                   >
-                    {isZh ? 'استعادة' : 'Revert'}
+                    {isArabic ? 'استعادة' : 'Revert'}
                   </button>
                 )}
               </div>
@@ -833,7 +833,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                       ? 'bg-[hsl(var(--color-card))] text-[hsl(var(--color-primary))] border-[hsl(var(--color-border))] shadow-xs font-semibold'
                       : 'bg-transparent text-[hsl(var(--color-muted-foreground))] border-transparent hover:bg-[hsl(var(--color-card)/0.6)] hover:text-[hsl(var(--color-foreground))]'
                   }`}
-                  title={isZh ? `المستند: ${doc.name}${isModified ? ' (معدل)' : ''}` : `Document: ${doc.name}${isModified ? ' (Modified)' : ''}`}
+                  title={isArabic ? `المستند: ${doc.name}${isModified ? ' (معدل)' : ''}` : `Document: ${doc.name}${isModified ? ' (Modified)' : ''}`}
                 >
                   <FileText
                     className={`w-3.5 h-3.5 shrink-0 ${
@@ -844,14 +844,14 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                   {isModified && (
                     <span
                       className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--color-primary))] shrink-0"
-                      title={isZh ? 'توجد تعديلات غير محفوظة' : 'Unsaved changes'}
+                      title={isArabic ? 'توجد تعديلات غير محفوظة' : 'Unsaved changes'}
                     />
                   )}
                   <button
                     type="button"
                     onClick={(e) => handleCloseDocument(doc.id, e)}
                     className="p-0.5 rounded-md hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-muted-foreground))] hover:text-red-500 opacity-60 group-hover:opacity-100 transition-all ml-0.5"
-                    title={isZh ? 'إغلاق المستند' : 'Close document'}
+                    title={isArabic ? 'إغلاق المستند' : 'Close document'}
                     aria-label={`Close ${doc.name}`}
                   >
                     <X className="w-3 h-3" />
@@ -867,10 +867,10 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
               type="button"
               onClick={() => multiFileInputRef.current?.click()}
               className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-dashed border-[hsl(var(--color-border))] hover:border-[hsl(var(--color-primary))] hover:bg-[hsl(var(--color-primary)/0.08)] text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-primary))] text-xs font-medium transition-all"
-              title={isZh ? 'فتح ملفات PDF إضافية (اختيار متعدد)' : 'Open or import more PDFs (multi-select)'}
+              title={isArabic ? 'فتح ملفات PDF إضافية (اختيار متعدد)' : 'Open or import more PDFs (multi-select)'}
             >
               <Plus className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{isZh ? 'استيراد المزيد من ملفات PDF' : 'Import More PDFs'}</span>
+              <span className="hidden sm:inline">{isArabic ? 'استيراد المزيد من ملفات PDF' : 'Import More PDFs'}</span>
             </button>
             <input
               ref={multiFileInputRef}
@@ -887,7 +887,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
             />
             {documents.length > 1 && (
               <span className="text-[10px] font-medium text-[hsl(var(--color-muted-foreground))] px-1.5 py-0.5 rounded bg-[hsl(var(--color-muted))]">
-                {isZh ? `عدد المستندات: ${documents.length} مستندات` : `${documents.length} Documents`}
+                {isArabic ? `عدد المستندات: ${documents.length} مستندات` : `${documents.length} Documents`}
               </span>
             )}
           </div>
@@ -926,8 +926,8 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                   <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-[hsl(var(--color-card)/0.95)] border border-[hsl(var(--color-border))] shadow-2xl">
                     <Loader2 className="w-8 h-8 text-[hsl(var(--color-primary))] animate-spin" />
                     <div className="text-center">
-                      <p className="text-xs font-bold text-[hsl(var(--color-foreground))]">{isZh ? 'جارٍ معالجة المستند...' : 'Processing document in-place...'}</p>
-                      <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] mt-0.5">{isZh ? 'معالجة محلية دون رفع الملفات للإنترنت' : '100% Client-side safe, zero network upload'}</p>
+                      <p className="text-xs font-bold text-[hsl(var(--color-foreground))]">{isArabic ? 'جارٍ معالجة المستند...' : 'Processing document in-place...'}</p>
+                      <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] mt-0.5">{isArabic ? 'معالجة محلية دون رفع الملفات للإنترنت' : '100% Client-side safe, zero network upload'}</p>
                     </div>
                   </div>
                 </div>
@@ -974,10 +974,10 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
               </div>
 
               <h2 className="text-xl font-bold text-[hsl(var(--color-foreground))] mb-2">
-                {isZh ? 'استورد PDF لبدء العمل' : 'Import PDF to Launch Studio Workspace'}
+                {isArabic ? 'استورد PDF لبدء العمل' : 'Import PDF to Launch Studio Workspace'}
               </h2>
               <p className="text-xs text-[hsl(var(--color-muted-foreground))] mb-6 leading-relaxed">
-                {isZh
+                {isArabic
                   ? 'اعمل على ملف PDF في مكان واحد: تدوير الصفحات، وإضافة العلامات المائية، والضغط، والتوقيع، واستخراج الصفحات دون إعادة رفع الملف.'
                   : 'No more jumping between tools or re-uploading. Rotate, watermark, compress, sign, and organize pages seamlessly in a single in-place view.'}
               </p>
@@ -990,7 +990,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                   className="flex-1 gap-2 shadow-lg shadow-[hsl(var(--color-primary)/0.2)] text-xs font-semibold py-2.5"
                 >
                   <FileText className="w-4 h-4" />
-                  <span>{isZh ? 'اختر ملفات PDF (اختيار متعدد)' : 'Select PDF Files (Multi-Select)'}</span>
+                  <span>{isArabic ? 'اختر ملفات PDF (اختيار متعدد)' : 'Select PDF Files (Multi-Select)'}</span>
                 </Button>
 
                 <Link
@@ -998,16 +998,16 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
                   className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-[hsl(var(--color-border))] text-xs font-semibold text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-muted))] transition-all"
                 >
                   <LayoutGrid className="w-4 h-4" />
-                  <span>{isZh ? 'العودة إلى جميع الأدوات' : 'Back to All Tools'}</span>
+                  <span>{isArabic ? 'العودة إلى جميع الأدوات' : 'Back to All Tools'}</span>
                 </Link>
               </div>
 
               <div className="mt-6 flex items-center gap-4 text-[11px] text-[hsl(var(--color-muted-foreground)/0.7)]">
-                <span>{isZh ? 'يمكنك سحب عدة ملفات PDF هنا' : 'Drag & drop multiple PDFs here'}</span>
+                <span>{isArabic ? 'يمكنك سحب عدة ملفات PDF هنا' : 'Drag & drop multiple PDFs here'}</span>
                 <span>•</span>
-                <span>{isZh ? 'معالجة محلية دون اتصال' : '100% Offline & Private'}</span>
+                <span>{isArabic ? 'معالجة محلية دون اتصال' : '100% Offline & Private'}</span>
                 <span>•</span>
-                <span>{isZh ? 'التبديل السريع بين الملفات' : 'Multi-Tab Document Switch'}</span>
+                <span>{isArabic ? 'التبديل السريع بين الملفات' : 'Multi-Tab Document Switch'}</span>
               </div>
             </div>
           </div>
@@ -1017,25 +1017,25 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       {debugOpen && (
         <div role="dialog" aria-label="Debug Log" className="fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-3 app-mobile-safe-dialog" style={{ paddingBottom: 'calc(3rem + env(safe-area-inset-bottom, 0px))' }}>
           <div className="bg-[hsl(var(--color-card))] text-[hsl(var(--color-foreground))] rounded-xl w-full max-w-2xl max-h-[85vh] flex flex-col p-4 gap-3">
-            <h2 className="font-bold">{isZh ? 'سجل العمليات والأخطاء' : 'Operations & Error Log'}</h2>
-            <textarea readOnly aria-label="Debug log content" className="w-full flex-1 min-h-[45vh] text-xs font-mono p-2 border rounded bg-[hsl(var(--color-background))]" value={[getDiagnosticReport(), ...debugEntries].join('\n') || (isZh ? 'لا توجد أحداث بعد' : 'No events yet')} />
+            <h2 className="font-bold">{isArabic ? 'سجل العمليات والأخطاء' : 'Operations & Error Log'}</h2>
+            <textarea readOnly aria-label="Debug log content" className="w-full flex-1 min-h-[45vh] text-xs font-mono p-2 border rounded bg-[hsl(var(--color-background))]" value={[getDiagnosticReport(), ...debugEntries].join('\n') || (isArabic ? 'لا توجد أحداث بعد' : 'No events yet')} />
             <div className="flex gap-2 flex-wrap">
-              <button type="button" className="border rounded px-3 py-2" onClick={() => { void navigator.clipboard?.writeText([getDiagnosticReport(), ...debugEntries].join('\n')).catch(() => {}); }}>{isZh ? 'نسخ السجل' : 'Copy Log'}</button>
-              <button type="button" className="border rounded px-3 py-2" onClick={() => { const blob = new Blob([[getDiagnosticReport(), ...debugEntries].join('\n')], { type: 'text/plain' }); void saveBlobFile(blob, '90-pdf-debug-log.txt').catch(err => notify('error', String(err))); }}>{isZh ? 'حفظ السجل' : 'Save Log'}</button>
-              <button type="button" className="border rounded px-3 py-2" onClick={() => { setDebugEntries([]); clearDiagnosticReport(); }}>{isZh ? 'مسح' : 'Clear'}</button>
-              <button type="button" className="border rounded px-3 py-2" onClick={() => setDebugOpen(false)}>{isZh ? 'إغلاق' : 'Close'}</button>
+              <button type="button" className="border rounded px-3 py-2" onClick={() => { void navigator.clipboard?.writeText([getDiagnosticReport(), ...debugEntries].join('\n')).catch(() => {}); }}>{isArabic ? 'نسخ السجل' : 'Copy Log'}</button>
+              <button type="button" className="border rounded px-3 py-2" onClick={() => { const blob = new Blob([[getDiagnosticReport(), ...debugEntries].join('\n')], { type: 'text/plain' }); void saveBlobFile(blob, '90-pdf-debug-log.txt').catch(err => notify('error', String(err))); }}>{isArabic ? 'حفظ السجل' : 'Save Log'}</button>
+              <button type="button" className="border rounded px-3 py-2" onClick={() => { setDebugEntries([]); clearDiagnosticReport(); }}>{isArabic ? 'مسح' : 'Clear'}</button>
+              <button type="button" className="border rounded px-3 py-2" onClick={() => setDebugOpen(false)}>{isArabic ? 'إغلاق' : 'Close'}</button>
             </div>
           </div>
         </div>
       )}
 
       {pendingExport && (
-        <div role="region" aria-label={isZh ? 'نتيجة جاهزة للحفظ' : 'Output ready to save'} className="fixed z-[150] left-3 right-3 sm:left-auto sm:right-6 sm:max-w-md rounded-xl border bg-[hsl(var(--color-card))] text-[hsl(var(--color-foreground))] shadow-xl p-3 flex flex-col gap-2" style={{ bottom: 'calc(10rem + var(--app-safe-bottom, 24px))' }}>
-          <div className="font-semibold text-sm">{isZh ? 'ملف جاهز للحفظ' : 'Output ready to save'}</div>
+        <div role="region" aria-label={isArabic ? 'نتيجة جاهزة للحفظ' : 'Output ready to save'} className="fixed z-[150] left-3 right-3 sm:left-auto sm:right-6 sm:max-w-md rounded-xl border bg-[hsl(var(--color-card))] text-[hsl(var(--color-foreground))] shadow-xl p-3 flex flex-col gap-2" style={{ bottom: 'calc(10rem + var(--app-safe-bottom, 24px))' }}>
+          <div className="font-semibold text-sm">{isArabic ? 'ملف جاهز للحفظ' : 'Output ready to save'}</div>
           <div className="text-xs break-all">{pendingExport.filename} · {(pendingExport.blob.size / 1024).toFixed(1)} KB</div>
           <div className="flex gap-2 flex-wrap">
-            <button type="button" disabled={isApplying} className="rounded bg-[hsl(var(--color-primary))] text-white px-3 py-2 text-sm disabled:opacity-50" onClick={async () => { const item = pendingExport; if (!item) return; setIsApplying(true); try { const saved = await saveBlobFile(item.blob, item.filename); if (saved) { setPendingExport(null); notify('success', isZh ? 'تم حفظ الملف' : 'File saved'); } else { notify('error', isZh ? 'لم يتم حفظ الملف' : 'File was not saved'); } } catch (err) { notify('error', String(err)); } finally { setIsApplying(false); } }}>{isZh ? 'إعادة الحفظ' : 'Retry save'}</button>
-            <button type="button" className="rounded border px-3 py-2 text-sm" onClick={() => setPendingExport(null)}>{isZh ? 'تجاهل النتيجة' : 'Discard output'}</button>
+            <button type="button" disabled={isApplying} className="rounded bg-[hsl(var(--color-primary))] text-white px-3 py-2 text-sm disabled:opacity-50" onClick={async () => { const item = pendingExport; if (!item) return; setIsApplying(true); try { const saved = await saveBlobFile(item.blob, item.filename); if (saved) { setPendingExport(null); notify('success', isArabic ? 'تم حفظ الملف' : 'File saved'); } else { notify('error', isArabic ? 'لم يتم حفظ الملف' : 'File was not saved'); } } catch (err) { notify('error', String(err)); } finally { setIsApplying(false); } }}>{isArabic ? 'إعادة الحفظ' : 'Retry save'}</button>
+            <button type="button" className="rounded border px-3 py-2 text-sm" onClick={() => setPendingExport(null)}>{isArabic ? 'تجاهل النتيجة' : 'Discard output'}</button>
           </div>
         </div>
       )}
