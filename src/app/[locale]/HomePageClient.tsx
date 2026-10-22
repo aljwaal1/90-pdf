@@ -299,7 +299,7 @@ export default function HomePageClient({ locale, localizedToolContent }: HomePag
               </div>
               <div className="p-4">
                 <div className="text-3xl lg:text-4xl font-bold text-gradient mb-1">
-                  9
+                  2
                 </div>
                 <div className="text-xs font-medium text-[hsl(var(--color-muted-foreground))] uppercase tracking-wider">
                   {t('home.stats.languages')}
