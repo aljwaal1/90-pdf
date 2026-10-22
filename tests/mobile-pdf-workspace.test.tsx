@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { PDFDocument } from 'pdf-lib';
 import MobilePdfWorkspace from '@/app/[locale]/mobile-pdf/MobilePdfWorkspace';
 
 vi.mock('tauri-plugin-android-fs-api', () => ({
@@ -28,5 +29,20 @@ describe('Quick mobile PDF workspace', () => {
     expect(screen.getByRole('button', { name: 'Process and save PDF' })).toBeDisabled();
     expect(screen.getByDisplayValue('90-pdf-result.pdf')).toBeInTheDocument();
     expect(screen.getByText('Input safety limit: 80 MB total')).toBeInTheDocument();
+  });
+  it('lets users select pages by tapping numbered buttons', async () => {
+    const doc = await PDFDocument.create();
+    doc.addPage([200, 300]);
+    doc.addPage([200, 300]);
+    const bytes = await doc.save();
+    const file = new File([new Uint8Array(bytes)], 'pages.pdf', { type: 'application/pdf' });
+    render(<MobilePdfWorkspace locale="en" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Extract' }));
+    const picker = document.querySelector('input[type="file"]') as HTMLInputElement;
+    Object.defineProperty(file, 'arrayBuffer', { value: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) });
+    fireEvent.change(picker, { target: { files: [file] } });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Page 2' })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
+    expect(screen.getByDisplayValue('2')).toBeInTheDocument();
   });
 });
