@@ -106,9 +106,13 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
   const [status, setStatus] = useState('');
   const [error, setError] = useState(false);
   const [outputName, setOutputName] = useState('90-pdf-result.pdf');
+  const [phase, setPhase] = useState<'idle' | 'processing' | 'saving'>('idle');
+  const [selectedPreview, setSelectedPreview] = useState<number[]>([]);
+  const [previewCount, setPreviewCount] = useState<number | null>(null);
 
   async function run() {
     setBusy(true);
+    setPhase('processing');
     setStatus('');
     setError(false);
     try {
@@ -116,6 +120,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
       const cleaned = outputName.trim().replace(/[\\/:*?"<>|\x00-\x1f]/g, '-').replace(/[. ]+$/g, '').slice(0, 100);
       const name = cleaned.toLowerCase().endsWith('.pdf') ? cleaned : cleaned + '.pdf';
       if (name === '.pdf' || !cleaned) throw new Error('Enter a valid output file name');
+      setPhase('saving');
       const destination = await savePdf(bytes, name);
       setStatus((ar ? 'تم حفظ الملف: ' : 'Saved PDF: ') + destination);
     } catch (error) {
@@ -123,6 +128,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
       setStatus((ar ? 'تعذر إتمام العملية: ' : 'Operation failed: ') + (error instanceof Error ? error.message : String(error)));
     } finally {
       setBusy(false);
+      setPhase('idle');
     }
   }
 
@@ -143,7 +149,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
           <button key={item.id} type="button" aria-pressed={op === item.id}
             className={`rounded-xl border px-3 py-3 ${op === item.id ? 'border-blue-600 bg-blue-100 text-slate-900' : ''}`}
             disabled={busy}
-            onClick={() => { setOp(item.id); setFiles([]); setStatus(''); setError(false); }}>
+            onClick={() => { setOp(item.id); setFiles([]); setStatus(''); setError(false); setSelectedPreview([]); setPreviewCount(null); }}>
             {ar ? item.ar : item.en}
           </button>
         ))}
@@ -156,6 +162,13 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
             const selection = Array.from(event.target.files ?? []);
             setFiles(selection);
             setStatus('');
+            setSelectedPreview([]);
+            setPreviewCount(null);
+            if (selection.length === 1 && op !== 'merge') {
+              void selection[0].arrayBuffer().then((bytes) => PDFDocument.load(bytes)).then((doc) => {
+                setPreviewCount(doc.getPageCount());
+              }).catch(() => setPreviewCount(null));
+            }
           }} />
       </label>
       {files.length > 0 && <p className="text-sm">{files.map((file) => file.name).join('، ')}</p>}
@@ -164,6 +177,29 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
           <span className="font-semibold">{ar ? 'الصفحات (مثال 1,3-5)' : 'Pages (example 1,3-5)'}</span>
           <input disabled={busy} inputMode="text" dir="ltr" className="block w-full rounded-lg border p-3" value={pages} onChange={(event) => setPages(event.target.value)} />
         </label>
+      )}
+      {op !== 'merge' && previewCount !== null && previewCount <= 150 && (
+        <section aria-label={ar ? 'اختيار الصفحات' : 'Choose pages'} className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold">{ar ? 'حدد الصفحات بالضغط عليها' : 'Tap pages to select'}</span>
+            <span className="text-sm opacity-70">{previewCount} {ar ? 'صفحة' : 'pages'}</span>
+          </div>
+          <div className="grid grid-cols-5 gap-2 max-h-56 overflow-y-auto">
+            {Array.from({ length: previewCount }, (_, i) => {
+              const active = selectedPreview.includes(i);
+              return <button key={i} type="button" disabled={busy}
+                aria-pressed={active} aria-label={(ar ? 'صفحة ' : 'Page ') + (i + 1)}
+                onClick={() => {
+                  const chosen = active ? selectedPreview.filter((p) => p !== i) : [...selectedPreview, i].sort((a,b) => a-b);
+                  setSelectedPreview(chosen);
+                  setPages(chosen.map((p) => p + 1).join(','));
+                }}
+                className={`min-h-11 rounded-lg border text-sm ${active ? 'border-blue-700 bg-blue-100 text-blue-900' : 'bg-transparent'}`}>
+                {i + 1}
+              </button>;
+            })}
+          </div>
+        </section>
       )}
       {op === 'rotate' && (
         <label className="block space-y-2">
@@ -181,7 +217,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
       <p className="text-xs opacity-75">{ar ? 'الحد الآمن للمدخلات: 80 ميغابايت إجمالًا' : 'Input safety limit: 80 MB total'}</p>
       <button type="button" disabled={busy || files.length === 0} onClick={run}
         className="w-full rounded-xl bg-blue-700 p-4 font-bold text-white disabled:opacity-50">
-        {busy ? (ar ? 'جارٍ المعالجة…' : 'Processing…') : (ar ? 'معالجة وحفظ PDF' : 'Process and save PDF')}
+        {busy ? (phase === 'saving' ? (ar ? 'جارٍ الحفظ…' : 'Saving…') : (ar ? 'جارٍ المعالجة…' : 'Processing…')) : (ar ? 'معالجة وحفظ PDF' : 'Process and save PDF')}
       </button>
       <p role={error ? "alert" : "status"} aria-live="polite" className={`break-words ${error ? "text-red-600" : "text-green-700"}`}>{status}</p>
     </main>
