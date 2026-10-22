@@ -26,5 +26,7 @@ describe('Quick mobile PDF workspace', () => {
     expect(next).not.toBe(initial);
     expect(next).not.toHaveAttribute('multiple');
     expect(screen.getByRole('button', { name: 'Process and save PDF' })).toBeDisabled();
+    expect(screen.getByDisplayValue('90-pdf-result.pdf')).toBeInTheDocument();
+    expect(screen.getByText('Input safety limit: 80 MB total')).toBeInTheDocument();
   });
 });
