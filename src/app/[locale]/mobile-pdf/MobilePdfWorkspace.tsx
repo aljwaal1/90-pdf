@@ -4,6 +4,8 @@ import { PDFDocument, degrees } from 'pdf-lib';
 import type { Locale } from '@/lib/i18n/config';
 
 type Operation = 'merge' | 'extract' | 'delete' | 'rotate';
+// Guard against unbounded in-memory copies in WebView; this is not a device-memory guarantee.
+const MAX_INPUT_BYTES = 80 * 1024 * 1024;
 
 function selectedPages(text: string, total: number): number[] {
   const selected = new Set<number>();
@@ -25,6 +27,10 @@ function selectedPages(text: string, total: number): number[] {
 
 async function processPdf(files: File[], op: Operation, pages: string, rotation: 90 | 180 | 270) {
   if (!files.length) throw new Error('Choose a PDF file');
+  if (files.some((file) => file.size === 0)) throw new Error('Empty files cannot be processed');
+  if (files.reduce((total, file) => total + file.size, 0) > MAX_INPUT_BYTES) {
+    throw new Error('Selected documents exceed the 80 MB safety limit');
+  }
   if (op === 'merge' && files.length < 2) throw new Error('Choose two or more PDF files to merge');
   const output = await PDFDocument.create();
   if (op === 'merge') {
@@ -98,6 +104,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('');
   const [error, setError] = useState(false);
+  const [outputName, setOutputName] = useState('90-pdf-result.pdf');
 
   async function run() {
     setBusy(true);
@@ -105,7 +112,9 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
     setError(false);
     try {
       const bytes = await processPdf(files, op, pages, rotation);
-      const name = '90-pdf-' + op + '-' + Date.now() + '.pdf';
+      const cleaned = outputName.trim().replace(/[\\\\/:*?"<>|\\x00-\\x1f]/g, '-').slice(0, 100);
+      const name = cleaned.toLowerCase().endsWith('.pdf') ? cleaned : cleaned + '.pdf';
+      if (name === '.pdf') throw new Error('Enter a valid output file name');
       const destination = await savePdf(bytes, name);
       setStatus((ar ? 'تم حفظ الملف: ' : 'Saved PDF: ') + destination);
     } catch (error) {
@@ -164,6 +173,11 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
           </select>
         </label>
       )}
+      <label className="block space-y-2">
+        <span className="font-semibold">{ar ? 'اسم الملف الناتج' : 'Output file name'}</span>
+        <input disabled={busy} className="block w-full rounded-lg border p-3" value={outputName} onChange={(event) => setOutputName(event.target.value)} />
+      </label>
+      <p className="text-xs opacity-75">{ar ? 'الحد الآمن للمدخلات: 80 ميغابايت إجمالًا' : 'Input safety limit: 80 MB total'}</p>
       <button type="button" disabled={busy || files.length === 0} onClick={run}
         className="w-full rounded-xl bg-blue-700 p-4 font-bold text-white disabled:opacity-50">
         {busy ? (ar ? 'جارٍ المعالجة…' : 'Processing…') : (ar ? 'معالجة وحفظ PDF' : 'Process and save PDF')}
