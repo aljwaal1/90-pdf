@@ -32,6 +32,7 @@ async function processPdf(files: File[], op: Operation, pages: string, rotation:
     throw new Error('Selected documents exceed the 80 MB safety limit');
   }
   if (op === 'merge' && files.length < 2) throw new Error('Choose two or more PDF files to merge');
+  if (op !== 'merge' && files.length !== 1) throw new Error('Choose exactly one PDF file');
   const output = await PDFDocument.create();
   if (op === 'merge') {
     for (const file of files) {
@@ -112,9 +113,9 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
     setError(false);
     try {
       const bytes = await processPdf(files, op, pages, rotation);
-      const cleaned = outputName.trim().replace(/[\\\\/:*?"<>|\\x00-\\x1f]/g, '-').slice(0, 100);
+      const cleaned = outputName.trim().replace(/[\\/:*?"<>|\x00-\x1f]/g, '-').replace(/[. ]+$/g, '').slice(0, 100);
       const name = cleaned.toLowerCase().endsWith('.pdf') ? cleaned : cleaned + '.pdf';
-      if (name === '.pdf') throw new Error('Enter a valid output file name');
+      if (name === '.pdf' || !cleaned) throw new Error('Enter a valid output file name');
       const destination = await savePdf(bytes, name);
       setStatus((ar ? 'تم حفظ الملف: ' : 'Saved PDF: ') + destination);
     } catch (error) {
@@ -161,13 +162,13 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
       {op !== 'merge' && (
         <label className="block space-y-2">
           <span className="font-semibold">{ar ? 'الصفحات (مثال 1,3-5)' : 'Pages (example 1,3-5)'}</span>
-          <input className="block w-full rounded-lg border p-3" value={pages} onChange={(event) => setPages(event.target.value)} />
+          <input disabled={busy} inputMode="text" dir="ltr" className="block w-full rounded-lg border p-3" value={pages} onChange={(event) => setPages(event.target.value)} />
         </label>
       )}
       {op === 'rotate' && (
         <label className="block space-y-2">
           <span className="font-semibold">{ar ? 'زاوية التدوير' : 'Rotation angle'}</span>
-          <select className="block w-full rounded-lg border p-3" value={rotation}
+          <select disabled={busy} className="block w-full rounded-lg border p-3" value={rotation}
             onChange={(event) => setRotation(Number(event.target.value) as 90 | 180 | 270)}>
             <option value={90}>90°</option><option value={180}>180°</option><option value={270}>270°</option>
           </select>
