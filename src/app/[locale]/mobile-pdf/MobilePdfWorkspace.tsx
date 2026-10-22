@@ -1,5 +1,5 @@
 'use client';
-import { useState, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import { PDFDocument, degrees } from 'pdf-lib';
 import type { Locale } from '@/lib/i18n/config';
 
@@ -109,6 +109,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
   const [phase, setPhase] = useState<'idle' | 'processing' | 'saving'>('idle');
   const [selectedPreview, setSelectedPreview] = useState<number[]>([]);
   const [previewCount, setPreviewCount] = useState<number | null>(null);
+  const selectionVersion = useRef(0);
 
   async function run() {
     setBusy(true);
@@ -149,7 +150,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
           <button key={item.id} type="button" aria-pressed={op === item.id}
             className={`rounded-xl border px-3 py-3 ${op === item.id ? 'border-blue-600 bg-blue-100 text-slate-900' : ''}`}
             disabled={busy}
-            onClick={() => { setOp(item.id); setFiles([]); setStatus(''); setError(false); setSelectedPreview([]); setPreviewCount(null); }}>
+            onClick={() => { setOp(item.id); setFiles([]); setStatus(''); setError(false); setSelectedPreview([]); setPreviewCount(null); selectionVersion.current += 1; }}>
             {ar ? item.ar : item.en}
           </button>
         ))}
@@ -164,10 +165,11 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
             setStatus('');
             setSelectedPreview([]);
             setPreviewCount(null);
+            const version = ++selectionVersion.current;
             if (selection.length === 1 && op !== 'merge') {
               void selection[0].arrayBuffer().then((bytes) => PDFDocument.load(bytes)).then((doc) => {
-                setPreviewCount(doc.getPageCount());
-              }).catch(() => setPreviewCount(null));
+                if (selectionVersion.current === version) setPreviewCount(doc.getPageCount());
+              }).catch(() => { if (selectionVersion.current === version) setPreviewCount(null); });
             }
           }} />
       </label>
@@ -175,7 +177,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
       {op !== 'merge' && (
         <label className="block space-y-2">
           <span className="font-semibold">{ar ? 'الصفحات (مثال 1,3-5)' : 'Pages (example 1,3-5)'}</span>
-          <input disabled={busy} inputMode="text" dir="ltr" className="block w-full rounded-lg border p-3" value={pages} onChange={(event) => setPages(event.target.value)} />
+          <input disabled={busy} inputMode="text" dir="ltr" className="block w-full rounded-lg border p-3" value={pages} onChange={(event) => { setPages(event.target.value); setSelectedPreview([]); }} />
         </label>
       )}
       {op !== 'merge' && previewCount !== null && previewCount <= 150 && (
