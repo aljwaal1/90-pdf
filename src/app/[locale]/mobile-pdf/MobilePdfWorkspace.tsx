@@ -1,70 +1,10 @@
 'use client';
 import { useRef, useState, type ChangeEvent } from 'react';
-import { PDFDocument, degrees } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
+import { processQuickPdf, type QuickPdfOperation } from '@/lib/pdf-quick-engine';
 import type { Locale } from '@/lib/i18n/config';
 
-type Operation = 'merge' | 'extract' | 'delete' | 'rotate';
-// Guard against unbounded in-memory copies in WebView; this is not a device-memory guarantee.
-const MAX_INPUT_BYTES = 80 * 1024 * 1024;
-
-function selectedPages(text: string, total: number): number[] {
-  const selected = new Set<number>();
-  for (const piece of text.split(',')) {
-    const value = piece.trim();
-    if (!value) continue;
-    const match = /^(\d+)(?:\s*-\s*(\d+))?$/.exec(value);
-    if (!match) throw new Error('Invalid page list. Example: 1,3-5');
-    const from = Number(match[1]);
-    const to = Number(match[2] ?? match[1]);
-    if (!Number.isSafeInteger(from) || !Number.isSafeInteger(to) || from < 1 || to > total || from > to) {
-      throw new Error('Page number is outside the document');
-    }
-    for (let page = from; page <= to; page++) selected.add(page - 1);
-  }
-  if (!selected.size) throw new Error('Select at least one page');
-  return [...selected];
-}
-
-async function processPdf(files: File[], op: Operation, pages: string, rotation: 90 | 180 | 270) {
-  if (!files.length) throw new Error('Choose a PDF file');
-  if (files.some((file) => file.size === 0)) throw new Error('Empty files cannot be processed');
-  if (files.reduce((total, file) => total + file.size, 0) > MAX_INPUT_BYTES) {
-    throw new Error('Selected documents exceed the 80 MB safety limit');
-  }
-  if (op === 'merge' && files.length < 2) throw new Error('Choose two or more PDF files to merge');
-  if (op !== 'merge' && files.length !== 1) throw new Error('Choose exactly one PDF file');
-  const output = await PDFDocument.create();
-  if (op === 'merge') {
-    for (const file of files) {
-      const source = await PDFDocument.load(await file.arrayBuffer());
-      const copies = await output.copyPages(source, source.getPageIndices());
-      copies.forEach((page) => output.addPage(page));
-    }
-  } else {
-    const source = await PDFDocument.load(await files[0].arrayBuffer());
-    const indices = selectedPages(pages, source.getPageCount());
-    if (op === 'extract') {
-      const copies = await output.copyPages(source, indices);
-      copies.forEach((page) => output.addPage(page));
-    } else {
-      if (op === 'delete' && new Set(indices).size === source.getPageCount()) {
-        throw new Error('Cannot delete all pages');
-      }
-      const copies = await output.copyPages(source, source.getPageIndices());
-      copies.forEach((page) => output.addPage(page));
-      if (op === 'delete') {
-        for (const index of indices.sort((a, b) => b - a)) output.removePage(index);
-      } else {
-        for (const index of indices) {
-          const page = output.getPage(index);
-          page.setRotation(degrees((page.getRotation().angle + rotation) % 360));
-        }
-      }
-    }
-  }
-  if (!output.getPageCount()) throw new Error('PDF output has no pages');
-  return output.save();
-}
+type Operation = QuickPdfOperation;
 
 async function savePdf(bytes: Uint8Array, name: string): Promise<string> {
   const inTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
@@ -117,7 +57,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
     setStatus('');
     setError(false);
     try {
-      const bytes = await processPdf(files, op, pages, rotation);
+      const bytes = await processQuickPdf(files, op, pages, rotation);
       const cleaned = outputName.trim().replace(/[\\/:*?"<>|\x00-\x1f]/g, '-').replace(/[. ]+$/g, '').slice(0, 100);
       const name = cleaned.toLowerCase().endsWith('.pdf') ? cleaned : cleaned + '.pdf';
       if (name === '.pdf' || !cleaned) throw new Error('Enter a valid output file name');
