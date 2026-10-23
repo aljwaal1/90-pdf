@@ -1,7 +1,7 @@
 'use client';
 import { useRef, useState, type ChangeEvent } from 'react';
 import { PDFDocument } from 'pdf-lib';
-import { processQuickPdf, type QuickPdfOperation } from '@/lib/pdf-quick-engine';
+import { processQuickPdf, MAX_QUICK_PDF_BYTES, type QuickPdfOperation } from '@/lib/pdf-quick-engine';
 import type { Locale } from '@/lib/i18n/config';
 
 type Operation = QuickPdfOperation;
@@ -49,6 +49,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
   const [phase, setPhase] = useState<'idle' | 'processing' | 'saving'>('idle');
   const [selectedPreview, setSelectedPreview] = useState<number[]>([]);
   const [previewCount, setPreviewCount] = useState<number | null>(null);
+  const [previewError, setPreviewError] = useState('');
   const selectionVersion = useRef(0);
 
   async function run() {
@@ -90,7 +91,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
           <button key={item.id} type="button" aria-pressed={op === item.id}
             className={`rounded-xl border px-3 py-3 ${op === item.id ? 'border-blue-600 bg-blue-100 text-slate-900' : ''}`}
             disabled={busy}
-            onClick={() => { setOp(item.id); setFiles([]); setStatus(''); setError(false); setSelectedPreview([]); setPreviewCount(null); selectionVersion.current += 1; }}>
+            onClick={() => { setOp(item.id); setFiles([]); setStatus(''); setError(false); setSelectedPreview([]); setPreviewCount(null); setPreviewError(''); setPages('1'); selectionVersion.current += 1; }}>
             {ar ? item.ar : item.en}
           </button>
         ))}
@@ -105,14 +106,22 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
             setStatus('');
             setSelectedPreview([]);
             setPreviewCount(null);
+            setPreviewError('');
+            setPages('1');
             const version = ++selectionVersion.current;
-            if (selection.length === 1 && op !== 'merge') {
+            if (selection.length === 1 && op !== 'merge' && selection[0].size > MAX_QUICK_PDF_BYTES) {
+              setPreviewError(ar ? 'الملف أكبر من حد 80 ميغابايت' : 'File exceeds the 80 MB limit');
+            } else if (selection.length === 1 && op !== 'merge') {
               void selection[0].arrayBuffer().then((bytes) => PDFDocument.load(bytes)).then((doc) => {
                 if (selectionVersion.current === version) setPreviewCount(doc.getPageCount());
-              }).catch(() => { if (selectionVersion.current === version) setPreviewCount(null); });
+              }).catch(() => { if (selectionVersion.current === version) {
+                setPreviewCount(null);
+                setPreviewError(ar ? 'تعذرت معاينة الملف. تأكد أنه PDF صالح وغير مشفر.' : 'Could not preview the PDF. It may be invalid or encrypted.');
+              } });
             }
           }} />
       </label>
+      {previewError && <p role="alert" className="text-sm text-red-600">{previewError}</p>}
       {files.length > 0 && <p className="text-sm">{files.map((file) => file.name).join('، ')}</p>}
       {op !== 'merge' && (
         <label className="block space-y-2">
@@ -157,7 +166,7 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
         <input disabled={busy} className="block w-full rounded-lg border p-3" value={outputName} onChange={(event) => setOutputName(event.target.value)} />
       </label>
       <p className="text-xs opacity-75">{ar ? 'الحد الآمن للمدخلات: 80 ميغابايت إجمالًا' : 'Input safety limit: 80 MB total'}</p>
-      <button type="button" disabled={busy || files.length === 0} onClick={run}
+      <button type="button" disabled={busy || files.length === 0 || !!previewError} onClick={run}
         className="w-full rounded-xl bg-blue-700 p-4 font-bold text-white disabled:opacity-50">
         {busy ? (phase === 'saving' ? (ar ? 'جارٍ الحفظ…' : 'Saving…') : (ar ? 'جارٍ المعالجة…' : 'Processing…')) : (ar ? 'معالجة وحفظ PDF' : 'Process and save PDF')}
       </button>
