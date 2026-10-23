@@ -25,7 +25,7 @@ export default function PdfPageThumbnails({ file, pageCount, selected, disabled,
       try {
         const pdfjs = await import('pdfjs-dist');
         // Bundled worker must be supplied locally; do not depend on any external CDN.
-        pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+        pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
         const data = new Uint8Array(await file.arrayBuffer());
         const loading = pdfjs.getDocument({ data });
         const document = await loading.promise;
