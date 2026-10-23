@@ -1,6 +1,8 @@
 'use client';
 import { useRef, useState, type ChangeEvent } from 'react';
 import { PDFDocument } from 'pdf-lib';
+import dynamic from 'next/dynamic';
+const PdfPageThumbnails = dynamic(() => import('./PdfPageThumbnails'), { ssr: false });
 import { processQuickPdf, MAX_QUICK_PDF_BYTES, type QuickPdfOperation } from '@/lib/pdf-quick-engine';
 import type { Locale } from '@/lib/i18n/config';
 
@@ -129,28 +131,15 @@ export default function MobilePdfWorkspace({ locale }: { locale: Locale }) {
           <input disabled={busy} inputMode="text" dir="ltr" className="block w-full rounded-lg border p-3" value={pages} onChange={(event) => { setPages(event.target.value); setSelectedPreview([]); }} />
         </label>
       )}
-      {op !== 'merge' && previewCount !== null && previewCount <= 150 && (
-        <section aria-label={ar ? 'اختيار الصفحات' : 'Choose pages'} className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-semibold">{ar ? 'حدد الصفحات بالضغط عليها' : 'Tap pages to select'}</span>
-            <span className="text-sm opacity-70">{previewCount} {ar ? 'صفحة' : 'pages'}</span>
-          </div>
-          <div className="grid grid-cols-5 gap-2 max-h-56 overflow-y-auto">
-            {Array.from({ length: previewCount }, (_, i) => {
-              const active = selectedPreview.includes(i);
-              return <button key={i} type="button" disabled={busy}
-                aria-pressed={active} aria-label={(ar ? 'صفحة ' : 'Page ') + (i + 1)}
-                onClick={() => {
-                  const chosen = active ? selectedPreview.filter((p) => p !== i) : [...selectedPreview, i].sort((a,b) => a-b);
-                  setSelectedPreview(chosen);
-                  setPages(chosen.map((p) => p + 1).join(','));
-                }}
-                className={`min-h-11 rounded-lg border text-sm ${active ? 'border-blue-700 bg-blue-100 text-blue-900' : 'bg-transparent'}`}>
-                {i + 1}
-              </button>;
-            })}
-          </div>
-        </section>
+      {op !== 'merge' && files.length === 1 && previewCount !== null && (
+        <PdfPageThumbnails file={files[0]} pageCount={previewCount} selected={selectedPreview}
+          disabled={busy} locale={locale} onToggle={(index) => {
+            const chosen = selectedPreview.includes(index)
+              ? selectedPreview.filter((p) => p !== index)
+              : [...selectedPreview, index].sort((a, b) => a - b);
+            setSelectedPreview(chosen);
+            setPages(chosen.map((p) => p + 1).join(','));
+          }} />
       )}
       {op === 'rotate' && (
         <label className="block space-y-2">
