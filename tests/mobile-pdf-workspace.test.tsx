@@ -45,4 +45,15 @@ describe('Quick mobile PDF workspace', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
     expect(screen.getByDisplayValue('2')).toBeInTheDocument();
   });
+
+  it('blocks unsafe preview of a file over the memory safety threshold', async () => {
+    render(<MobilePdfWorkspace locale="en" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Extract' }));
+    const large = new File(['%PDF-'], 'large.pdf', { type: 'application/pdf' });
+    Object.defineProperty(large, 'size', { value: 81 * 1024 * 1024 });
+    const picker = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(picker, { target: { files: [large] } });
+    expect(screen.getByRole('alert')).toHaveTextContent('File exceeds the 80 MB limit');
+    expect(screen.getByRole('button', { name: 'Process and save PDF' })).toBeDisabled();
+  });
 });
