@@ -13,7 +13,7 @@ async function savePdf(bytes: Uint8Array, name: string): Promise<string> {
   if (inTauri) {
     const fs = await import('tauri-plugin-android-fs-api');
     if (fs.isAndroid()) {
-      let uri: string | undefined;
+      let uri: Awaited<ReturnType<typeof fs.createNewPublicFile>> | undefined;
       try {
         uri = await fs.createNewPublicFile(fs.PublicGeneralPurposeDir.Download, '90 PDF/' + name, 'application/pdf', { isPending: true });
         await fs.writeFile(uri, bytes);
