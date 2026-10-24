@@ -1,0 +1,39 @@
+name: PDF engine regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vitest.config.ts'
+      - 'tests/**'
+      - 'src/**'
+      - '.github/workflows/pdf-regression.yml'
+  push:
+    branches: [improve/pdf-open-source-reuse]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pdf-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Check TypeScript
+        run: npx tsc --noEmit --pretty false
+      - name: Run unit and PDF regression tests
+        run: npm test
+      - name: Build production web assets
+        run: npm run build
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Test native file path guards
+        working-directory: src-tauri
+        run: cargo test --lib

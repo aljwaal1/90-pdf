@@ -122,6 +122,9 @@ export default function HomePageClient({ locale, localizedToolContent }: HomePag
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-3.5 justify-center items-center">
+                <Link href={`/${locale}/mobile-pdf`} className="inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-blue-500 px-5 py-3 font-semibold">
+                  {locale === 'ar' ? 'أدوات PDF السريعة للهاتف' : 'Quick mobile PDF tools'}
+                </Link>
                 <Link href={`/${locale}/studio`}>
                   <Button
                     variant="primary"
@@ -296,7 +299,7 @@ export default function HomePageClient({ locale, localizedToolContent }: HomePag
               </div>
               <div className="p-4">
                 <div className="text-3xl lg:text-4xl font-bold text-gradient mb-1">
-                  9
+                  2
                 </div>
                 <div className="text-xs font-medium text-[hsl(var(--color-muted-foreground))] uppercase tracking-wider">
                   {t('home.stats.languages')}
